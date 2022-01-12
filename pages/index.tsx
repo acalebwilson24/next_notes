@@ -1,16 +1,19 @@
 import { Note, PrismaClient, User } from '@prisma/client';
-import type { GetStaticProps, NextPage } from 'next'
+import type { GetServerSideProps, GetStaticProps, NextPage } from 'next'
+import { signIn, signOut, useSession } from 'next-auth/react';
 import Link from 'next/dist/client/link';
 import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect } from 'react';
+import Header from '../components/Header';
+import { Block } from '../components/Layout/Layout';
+import prisma from '../prisma/client';
 import styles from '../styles/Home.module.css'
 
 
 type SerialisedNote = Pick<Note, "authorID" | "content" | "id" | "title"> & { createdAt: string, updatedAt: string };
 
-export const getStaticProps: GetStaticProps = async () => {
-  const prisma = new PrismaClient();
+export const getServerSideProps: GetServerSideProps = async () => {
 
   const users = await prisma.user.findMany({
     include: {
@@ -33,25 +36,76 @@ type Props = {
   notes: Note[]
 }
 
+type LinkType = {
+  label: string
+  slug: string
+};
+
 const Home: NextPage<Props> = ({ users, notes }) => {
 
+  const { data: session } = useSession();
+
+  const linkTypes: LinkType[] = [
+    {
+      label: "Static",
+      slug: "static"
+    },
+    {
+      label: "Server Side",
+      slug: "server-side"
+    },
+    {
+      label: "Static With Client",
+      slug: "static-with-client"
+    },
+    {
+      label: "Client Side",
+      slug: "client"
+    }
+  ]
+
   return (
-    <div style={{ display: "flex", gap: "1rem", width: "100%", height: "100vh", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-      {users && users.map(u => {
-        return (
-          <div style={{ border: "1px solid black", padding: "1rem", width: "300px" }} key={u.id}>
-            <p>Name: {u.name}</p>
-            <p>Email: {u.email}</p>
-            <div className='notes'>
-              {u.notes.length > 0 && <h4>Notes</h4>}
-              <ul>
-                {u.notes && u.notes.map(n => <li key={n.id}><Link href={`/note/${n.id}`}>{n.title}</Link></li>)}
-              </ul>
-            </div>
-          </div>
-        )
-      })}
-    </div>
+    <>
+      <Block width="standard">
+        {session ?
+          <>
+            <p>Signed in as {session.user?.name}</p>
+            <button onClick={() => signOut()}>Sign Out</button>
+          </> :
+          <button onClick={() => signIn()}>Sign In</button>
+        }
+      </Block>
+      <Block width="standard">
+        <div className={styles.home}>
+          {users && users.map(u => {
+            return (
+              <div className={styles.userCard} key={u.id}>
+                <p>Name: {u.name}</p>
+                <p>Email: {u.email}</p>
+                <div className='notes'>
+                  {u.notes.length > 0 && <h4>Notes</h4>}
+                  <ul>
+                    {u.notes && u.notes.map(n => (
+                      <li key={n.id}>
+                        <h4>{n.title}</h4>
+                        <ul>
+                          {linkTypes.map(l => (
+                            <li key={l.slug + l.label}>
+                              <Link href={`/notes/${l.slug}/${n.id}`}>{l.label}</Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </li>
+                    )
+                    )}
+                  </ul>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </Block>
+    </>
   )
 }
 
