@@ -2,7 +2,7 @@
 import { Note, PrismaClient, User } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { getSession } from 'next-auth/react';
-import prisma from '../../../prisma/client';
+import prisma from '../../../../prisma/client';
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,7 +14,6 @@ export default async function handler(
         if (!session) {
             return res.status(401).send("Not logged in")
         }
-        console.log(session);
         const notes = await prisma.note.findMany({
             where: {
                 authorID: session.user.id
@@ -67,5 +66,33 @@ export default async function handler(
         })
 
         res.send(newNote);
+    } else if (req.method === "DELETE") {
+        const session = await getSession({ req })
+        if (!session) {
+            return res.send("no");
+        }
+
+        const note = await prisma.note.findUnique({
+            where: {
+                id: parseInt(req.body.id)
+            }
+        });
+
+        if (!note) {
+            return res.send("No Note")
+        }
+
+        if (note.authorID !== session.user.id) {
+            return res.send("Unauthorised");
+        }
+
+        const deletedNote = await prisma.note.delete({
+            where: {
+                id: parseInt(req.body.id)
+            }
+        })
+
+        return res.send(deletedNote);
+
     }
 }

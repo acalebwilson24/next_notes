@@ -14,9 +14,6 @@ interface IParams extends ParsedUrlQuery {
 export const getStaticPaths: GetStaticPaths = async () => {
     const notes = await prisma.note.findMany({ select: { id: true } });
 
-
-    console.log(process.env.GITHUB_ID, process.env.GITHUB_SECRET, "hello")
-
     return {
         paths: notes.map(n => ({ params: { id: n.id.toString() } })),
         fallback: true
