@@ -17,7 +17,12 @@ export default async function handler(
         const notes = await prisma.note.findMany({
             where: {
                 authorID: session.user.id
-            }
+            },
+            orderBy: [
+                {
+                    updatedAt: "desc"
+                }
+            ]
         })
 
         res.send(notes);
@@ -31,6 +36,8 @@ export default async function handler(
 
         const note = await prisma.note.create({
             data: {
+                title: req.body.title || "",
+                content: req.body.content || "",
                 authorID: session.user.id
             }
         })

@@ -1,0 +1,31 @@
+.noteCard {
+    padding: 1rem;
+    border-bottom: 1px solid rgb(212, 212, 212);
+    min-height: 130px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.noteCard:not(:last-child) {
+}
+
+.noteCard h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.noteCard p {
+    margin: 0;
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.noteCard .updated {
+    margin-top: auto;
+}
+
+.selected {
+    background-color: rgb(230, 243, 242);
+}

@@ -5,15 +5,18 @@ import Link from 'next/dist/client/link';
 import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import Header from '../components/Header';
 import { Block } from '../components/Layout/Layout';
 import prisma from '../prisma/client';
+import { set } from '../redux/slices/titleSlice';
 import styles from '../styles/Home.module.css'
+import { NextSeo } from 'next-seo'
 
 
 type SerialisedNote = Pick<Note, "authorID" | "content" | "id" | "title"> & { createdAt: string, updatedAt: string };
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
 
   const users = await prisma.user.findMany({
     include: {
@@ -44,6 +47,7 @@ type LinkType = {
 const Home: NextPage<Props> = ({ users, notes }) => {
 
   const { data: session } = useSession();
+  const dispatch = useDispatch();
 
   const linkTypes: LinkType[] = [
     {
@@ -64,8 +68,13 @@ const Home: NextPage<Props> = ({ users, notes }) => {
     }
   ]
 
+  useEffect(() => {
+    dispatch(set("Note App"));
+  }, [])
+
   return (
     <>
+      <NextSeo title='Home' />
       <Block width="standard">
         {session ?
           <>

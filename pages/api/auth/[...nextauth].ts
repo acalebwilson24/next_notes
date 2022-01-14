@@ -5,16 +5,17 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import prisma from '../../../prisma/client';
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 
+const isProduction = process.env.APP_ENV == "prod";
 export default NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
         GithubProvider({
-            clientId: process.env.GITHUB_ID,
-            clientSecret: process.env.GITHUB_SECRET
+            clientId: (isProduction ? process.env.GITHUB_PRODUCTION_ID : process.env.GITHUB_ID) || "",
+            clientSecret: (isProduction ? process.env.GITHUB_PRODUCTION_SECRET : process.env.GITHUB_SECRET) || ""
         }),
         GoogleProvider({
-            clientId: process.env.GOOGLE_KEY || "",
-            clientSecret: process.env.GOOGLE_SECRET || ""
+            clientId: (isProduction ? process.env.GOOGLE_PRODUCTION_KEY : process.env.GOOGLE_KEY) || "",
+            clientSecret: (isProduction ? process.env.GOOGLE_PRODUCTION_SECRET : process.env.GOOGLE_SECRET) || ""
         })
         // CredentialsProvider({
         //     name: "Credentials",
@@ -47,5 +48,6 @@ export default NextAuth({
             // console.log("hello there", session, token, user);
             return {...session, user} as Session
         }
-    }
+    },
+    secret: process.env.SECRET
 })

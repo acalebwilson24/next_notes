@@ -9,7 +9,6 @@ import Form, { FormInput, FormSection, FormTextArea } from "../../../components/
 import { Block } from "../../../components/Layout";
 import prisma from "../../../prisma/client";
 import { useDeleteNoteMutation, useUpdateNoteMutation } from "../../../redux/noteApi";
-import fetcher from "../../../swr/fetcher";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { id } = context.query;
