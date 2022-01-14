@@ -5,7 +5,7 @@
     "gcp-predeploy": "find ./build -name '\\[...*' -exec bash -c 'mv \"$1\" \"${1/.../@@@}\"' -- {} \\;",
     "gcp-build": "find ./build -name '\\[@@@*' -exec bash -c 'mv \"$1\" \"${1/@@@/...}\"' -- {} \\;",
     "dev": "next dev -p 8083 && APP_ENV=dev",
-    "build": "npm install && next build",
+    "build": "npm list && next build",
     "start": "next start",
     "lint": "next lint",
     "deploy": "npm run build && npm run gcp-predeploy && gcloud app deploy"
