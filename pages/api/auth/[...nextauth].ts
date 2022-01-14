@@ -49,5 +49,10 @@ export default NextAuth({
             return {...session, user} as Session
         }
     },
+    events: {
+      signIn: (message) => {
+          console.log(message);
+      }  
+    },
     secret: process.env.SECRET
 })
