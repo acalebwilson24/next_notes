@@ -11,13 +11,14 @@ import { useGetNoteQuery } from '../../../redux/noteApi';
 const NotePage: NextPage = () => {
     const router = useRouter()
     const { id } = router.query;
+    const isValidID = typeof id == "string";
+    const { data: note, isLoading, isError } = useGetNoteQuery(isValidID ? id : 0, { skip: !isValidID });
 
-    if (!(typeof id == "string")) {
+    if (!isValidID) {
         router.push("/");
         return null
     }
 
-    const { data: note, isLoading, isError } = useGetNoteQuery(id);
 
     return (
         <div style={{ padding: "2rem 1rem" }}>

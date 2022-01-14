@@ -183,7 +183,7 @@ type Props = {
 const NoteList: React.FC<Props> = ({ notes, pathname, selected }) => {
     return (
         <>
-            {notes.map(n => <Link href={`${pathname}?id=${n.id}`}><a><NoteListItem key={n.id} {...n} selected={n.id == selected} /></a></Link>) || null}
+            {notes.map(n => <Link key={n.id} href={`${pathname}?id=${n.id}`}><a><NoteListItem {...n} selected={n.id == selected} /></a></Link>) || null}
         </>
     ) 
 }
