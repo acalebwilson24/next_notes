@@ -4,6 +4,7 @@ import { NextPage } from 'next/types';
 import { useEffect } from 'react';
 import NoteComponent from '../../../components/Note/Note';
 import { useGetNoteQuery } from '../../../redux/noteApi';
+import { inflateNote } from '../../../utils/note';
 
 
 
@@ -24,7 +25,7 @@ const NotePage: NextPage = () => {
     return (
         <div style={{ padding: "2rem 1rem" }}>
             <div style={{  maxWidth: "800px", margin: "0 auto" }}>
-                {isError ? <p>Error</p> : note ? <NoteComponent {...note} /> : <p>Loading...</p>}
+                {isError ? <p>Error</p> : note ? <NoteComponent {...inflateNote(note)} /> : <p>Loading...</p>}
             </div>
         </div>
     )

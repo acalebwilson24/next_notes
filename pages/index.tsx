@@ -12,7 +12,7 @@ import prisma from '../prisma/client';
 import { set } from '../redux/slices/titleSlice';
 import styles from '../styles/Home.module.css'
 import { NextSeo } from 'next-seo'
-import { serialiseNoteFromDB } from '../utils/note';
+import { inflateNote, serialiseNoteFromDB } from '../utils/note';
 
 
 type SerialisedNote = Pick<Note, "authorID" | "content" | "id" | "title"> & { createdAt: string, updatedAt: string };
@@ -41,8 +41,8 @@ export const getStaticProps: GetStaticProps = async () => {
 }
 
 type Props = {
-  users: (User & { notes: Note[] })[]
-  notes: Note[]
+  users: (User & { notes: SerialisedNote[] })[]
+  notes: SerialisedNote[]
 }
 
 type LinkType = {
@@ -100,19 +100,22 @@ const Home: NextPage<Props> = ({ users, notes }) => {
                 <div className='notes'>
                   {u.notes.length > 0 && <h4>Notes</h4>}
                   <ul>
-                    {u.notes && u.notes.map(n => (
-                      <li key={n.id}>
-                        <h4>{n.title}</h4>
-                        <ul>
-                          {linkTypes.map(l => (
-                            <li key={l.slug + l.label}>
-                              <Link href={`/notes/${l.slug}/${n.id}`}>{l.label}</Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </li>
-                    )
-                    )}
+                    {u.notes && u.notes.map(n => {
+                      const note = inflateNote(n);
+                      if (note) {
+                        return (
+                        <li key={note.id}>
+                          <h4>{note.title.getCurrentContent().getPlainText()}</h4>
+                          <ul>
+                            {linkTypes.map(l => (
+                              <li key={l.slug + l.label}>
+                                <Link href={`/notes/${l.slug}/${n.id}`}>{l.label}</Link>
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      )}
+                    })}
                   </ul>
                 </div>
               </div>

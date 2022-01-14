@@ -7,7 +7,7 @@ import Header from '../../../components/Header/Header';
 import NoteComponent from '../../../components/Note/Note';
 import prisma from '../../../prisma/client';
 import { SerialisedNote } from '../../../redux/noteApi';
-import { serialiseNoteFromDB } from '../../../utils/note';
+import { inflateNote, serialiseNoteFromDB } from '../../../utils/note';
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
     const { id } = context.query
@@ -46,7 +46,7 @@ const NotePage: NextPage<Props> = ({ note }) => {
     return (
         <div style={{ padding: "2rem 1rem" }}>
             <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-                {note ? <NoteComponent {...note} /> : <p>No Note</p>}
+                {note ? <NoteComponent {...inflateNote(note)} /> : <p>No Note</p>}
             </div>
         </div>
     )

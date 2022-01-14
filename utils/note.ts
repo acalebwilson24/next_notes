@@ -17,15 +17,15 @@ export function convertEditorStateToString(state: EditorState) {
 
 export function inflateNote(note: SerialisedNote) {
     let newNote: InflatedNote;
+    newNote = {
+        ...note,
+        createdAt: new Date(note.createdAt),
+        updatedAt: new Date(note.updatedAt),
+        title: note.title ? createEditorStateFromString(note.title) || EditorState.createEmpty() : EditorState.createEmpty(),
+        content: note.content ? createEditorStateFromString(note.content) || EditorState.createEmpty() : EditorState.createEmpty(),
+    }
+    return newNote;
     try {
-        newNote = {
-            ...note,
-            createdAt: new Date(note.createdAt),
-            updatedAt: new Date(note.updatedAt),
-            title: note.title ? createEditorStateFromString(note.title) || EditorState.createEmpty() : EditorState.createEmpty(),
-            content: note.content ? createEditorStateFromString(note.content) || EditorState.createEmpty() : EditorState.createEmpty(),
-        }
-        return newNote;
     } catch (error) {
         console.error(error);
     }
@@ -41,7 +41,6 @@ export function serialiseNote(note: InflatedNote) {
 }
 
 export function serialiseNoteFromDB(note: Note) {
-    console.log(typeof note.updatedAt)
     return {
         ...note,
         createdAt: note.createdAt.toString(),
