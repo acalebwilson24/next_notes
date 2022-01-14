@@ -12,6 +12,7 @@ import prisma from '../prisma/client';
 import { set } from '../redux/slices/titleSlice';
 import styles from '../styles/Home.module.css'
 import { NextSeo } from 'next-seo'
+import { serialiseNoteFromDB } from '../utils/note';
 
 
 type SerialisedNote = Pick<Note, "authorID" | "content" | "id" | "title"> & { createdAt: string, updatedAt: string };
@@ -28,8 +29,13 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      users,
-      notes
+      users: users.map(u => {
+        return {
+          ...u,
+          notes: u.notes.map(n => serialiseNoteFromDB(n))
+        }
+      }),
+      notes: notes.map(n => serialiseNoteFromDB(n))
     }
   }
 }
