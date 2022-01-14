@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql"
+    provider = "mysql"
     url      = env("DATABASE_URL")
 }
 
@@ -13,7 +13,7 @@ model Note {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     title     String?   @db.VarChar(255)
-    content   String?  @db.Text
+    content   String?  @db.MediumText
     author    User     @relation(fields: [authorID], references: [id])
     authorID  Int
 }
