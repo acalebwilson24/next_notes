@@ -3,16 +3,17 @@ generator client {
 }
 
 datasource db {
-    provider = "mysql"
+    provider = "postgresql"
     url      = env("DATABASE_URL")
 }
+
 
 model Note {
     id        Int      @id @default(autoincrement())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     title     String?   @db.VarChar(255)
-    content   String?  @db.MediumText
+    content   String?  @db.Text
     author    User     @relation(fields: [authorID], references: [id])
     authorID  Int
 }
