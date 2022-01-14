@@ -83,20 +83,22 @@ const Home: NextPage<Props> = ({ users, notes }) => {
       <NextSeo title='Home' />
       <Block width="standard">
         {session ?
-          <>
+          <div className={styles.user}>
             <p>Signed in as {session.user?.name}</p>
             <button onClick={() => signOut()}>Sign Out</button>
-          </> :
-          <button onClick={() => signIn()}>Sign In</button>
+          </div> :
+          <div className={styles.login}>
+            <button onClick={() => signIn()}>Sign In</button>
+          </div>
         }
       </Block>
       <Block width="standard">
+        <h1 style={{marginTop: 0}}>Users</h1>
         <div className={styles.home}>
           {users && users.map(u => {
             return (
               <div className={styles.userCard} key={u.id}>
-                <p>Name: {u.name}</p>
-                <p>Email: {u.email}</p>
+                <p>{u.name?.split(" ")[0]}</p>
                 <div className='notes'>
                   {u.notes.length > 0 && <h4>Notes</h4>}
                   <ul>
