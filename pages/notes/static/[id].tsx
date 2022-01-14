@@ -6,6 +6,7 @@ import { ParsedUrlQuery } from 'querystring';
 import Header from '../../../components/Header/Header';
 import NoteComponent from '../../../components/Note/Note';
 import prisma from '../../../prisma/client';
+import { SerialisedNote } from '../../../redux/noteApi';
 
 interface IParams extends ParsedUrlQuery {
     id: string
@@ -37,7 +38,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 }
 
 type Props = {
-    note: Note
+    note: SerialisedNote
 }
 
 const NotePage: NextPage<Props> = ({ note }) => {

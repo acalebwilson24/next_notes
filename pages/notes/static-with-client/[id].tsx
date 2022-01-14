@@ -1,9 +1,8 @@
-import { PrismaClient } from '@prisma/client';
-import axios from 'axios';
-import Router, { useRouter } from 'next/router';
-import { GetStaticPaths, GetStaticProps, NextPage } from 'next/types';
-import useSWR from 'swr';
-import NoteComponent, { NoteByID } from '../../../components/Note/Note';
+
+import { useRouter } from 'next/router';
+import { NextPage } from 'next/types';
+import { useEffect } from 'react';
+import NoteComponent from '../../../components/Note/Note';
 import { useGetNoteQuery } from '../../../redux/noteApi';
 
 
@@ -14,10 +13,12 @@ const NotePage: NextPage = () => {
     const isValidID = typeof id == "string";
     const { data: note, isLoading, isError } = useGetNoteQuery(isValidID ? id : 0, { skip: !isValidID });
 
-    if (!isValidID) {
-        router.push("/");
-        return null
-    }
+    
+    useEffect(() => {
+        if (!isValidID) {
+            router.push("/");
+        }
+    }, [isValidID])
 
 
     return (

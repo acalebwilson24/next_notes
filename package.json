@@ -2,10 +2,13 @@
   "name": "next_test",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 8083",
-    "build": "next build",
-    "start": "next start -p 8084",
-    "lint": "next lint"
+    "gcp-predeploy": "find ./build -name '\\[...*' -exec bash -c 'mv \"$1\" \"${1/.../@@@}\"' -- {} \\;",
+    "gcp-build": "find ./build -name '\\[@@@*' -exec bash -c 'mv \"$1\" \"${1/@@@/...}\"' -- {} \\;",
+    "dev": "next dev -p 8083 && APP_ENV=dev",
+    "build": "rm -rf ./build && APP_ENV=prod next build",
+    "start": "next start -p 8080",
+    "lint": "next lint",
+    "deploy": "npm run build && npm run gcp-predeploy && gcloud app deploy"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.1",

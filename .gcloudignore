@@ -1,0 +1,8 @@
+# Next.js source code
+/pages/
+/components/
+/prisma/
+/redux/
+/styles/
+/types/
+/node_modules/
