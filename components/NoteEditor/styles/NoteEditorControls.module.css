@@ -1,0 +1,45 @@
+.left {
+    display: grid;
+    grid-template-rows: 120px auto;
+    height: 700px;
+    border-right: 1px solid rgb(212, 212, 212);
+}
+
+.leftTop {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.leftTop a {
+    display: block;
+    width: 100%;
+    background-color: rgb(71 131 127);
+    color: white;
+    text-align: center;
+    padding: 0.5rem 1rem;
+}
+
+.notesList {
+    flex-grow: 2;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.search {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex-grow: 2;
+}
+
+.search input {
+    padding: 0.5rem;
+    border: 1px solid rgb(212, 212, 212)
+}
+
+.search input:is(:focus-within) {
+    border: 1px solid rgb(126, 126, 126);
+    outline: none;
+}

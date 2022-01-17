@@ -55,7 +55,7 @@ const Account: React.FC = () => {
                     <div className={styles.user}>
                         <div className={styles.userImage}>
                             <div className={styles.imageContainer}>
-                                <Image src={`${session.user.image}`} width={100} height={100} quality={50} />
+                                <Image src={`${session.user.image}`} width={100} height={100} quality={50} objectFit="cover" />
                             </div>
                             <input type="file" onChange={(e) => e.target.files ? setFile(e.target.files[0]) : setFile(null)} />
                             <button onClick={handleUpload}>Upload</button>

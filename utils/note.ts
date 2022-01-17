@@ -25,10 +25,6 @@ export function inflateNote(note: SerialisedNote) {
         content: note.content ? createEditorStateFromString(note.content) || EditorState.createEmpty() : EditorState.createEmpty(),
     }
     return newNote;
-    try {
-    } catch (error) {
-        console.error(error);
-    }
 }
 
 export function serialiseNote(note: InflatedNote) {
@@ -68,12 +64,6 @@ export function isJSONStr(str: string) {
     return true;
 }
 
-export function inflateValidNotes(notes: SerialisedNote[]) {
-    return notes.map(n => {
-        if (n.title && isJSONStr(n.title)) {
-            const inflatedNote = inflateNote(n);
-            if (inflatedNote) return inflatedNote;
-        }
-        return n;
-    })
+export function inflateNotes(notes: SerialisedNote[]) {
+    return notes.filter(n => n.title && isJSONStr(n.title)).map(n => inflateNote(n));
 }

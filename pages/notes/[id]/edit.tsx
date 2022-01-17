@@ -7,7 +7,7 @@ import useSWR, { useSWRConfig } from "swr";
 import Button from "../../../components/Button";
 import Form, { FormInput, FormSection, FormTextArea } from "../../../components/Form/Form";
 import { Block } from "../../../components/Layout";
-import prisma from "../../../prisma/client";
+import { prisma } from "../../../prisma/client";
 import { useDeleteNoteMutation, useUpdateNoteMutation } from "../../../redux/noteApi";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

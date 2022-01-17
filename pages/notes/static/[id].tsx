@@ -5,7 +5,7 @@ import { GetStaticPaths, GetStaticProps, NextPage } from 'next/types';
 import { ParsedUrlQuery } from 'querystring';
 import Header from '../../../components/Header/Header';
 import NoteComponent from '../../../components/Note/Note';
-import prisma from '../../../prisma/client';
+import { prisma } from '../../../prisma/client';
 import { SerialisedNote } from '../../../redux/noteApi';
 import { inflateNote, serialiseNoteFromDB } from '../../../utils/note';
 

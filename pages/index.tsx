@@ -8,7 +8,7 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import Header from '../components/Header';
 import { Block } from '../components/Layout/Layout';
-import prisma from '../prisma/client';
+import { prisma } from '../prisma/client';
 import { set } from '../redux/slices/titleSlice';
 import styles from '../styles/Home.module.css'
 import { NextSeo } from 'next-seo'
@@ -17,7 +17,7 @@ import { inflateNote, serialiseNoteFromDB } from '../utils/note';
 
 type SerialisedNote = Pick<Note, "authorID" | "content" | "id" | "title"> & { createdAt: string, updatedAt: string };
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
 
   const users = await prisma.user.findMany({
     include: {

@@ -2,7 +2,7 @@ import NextAuth, { Session } from 'next-auth';
 import GithubProvider from 'next-auth/providers/github'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials';
-import prisma from '../../../prisma/client';
+import { prisma } from '../../../prisma/client';
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 
 const isProduction = process.env.APP_ENV == "prod";

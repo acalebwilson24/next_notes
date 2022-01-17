@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import nextConnect from 'next-connect';
 import multer from 'multer'
-import prisma from "../../../../prisma/client";
+import { prisma } from "../../../../prisma/client";
 import { getSession } from "next-auth/react";
 
 const upload = multer({
