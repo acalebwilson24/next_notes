@@ -20,8 +20,8 @@ const NoteCard: React.FC<SerialisedNote & { selected?: boolean }> = ({ title, co
 export const InflatedNoteCard: React.FC<InflatedNote & { selected?: boolean }> = ({ title, content, updatedAt, ...props }) => {
     return (
         <div className={`${styles.noteCard} ${props.selected && styles.selected}`}>
-            <h3>{title.getCurrentContent().getPlainText("\u0001")}</h3>
-            <p>{content.getCurrentContent().getPlainText("\u00001").slice(0, 50).trim()}...</p>
+            <h3>{title.getCurrentContent().getPlainText("\n")}</h3>
+            <p>{content.getCurrentContent().getPlainText("\n").slice(0, 50).trim()}...</p>
             <p className={styles.updated}>
                 Last updated: {updatedAt.toDateString()}
             </p>

@@ -4,12 +4,12 @@ import NoteEditorMain from "./NoteEditorMain";
 import useNoteEditor from "./hooks/useNoteEditor";
 
 const NoteEditor: React.FC = () => {
-    const { search, setSearch, isError, inflatedNotes, id, note, setNote, save } = useNoteEditor();
+    const { search, setSearch, isError, inflatedNotes, id, note, setNote, saveNote, deleteNote, areNotesLoading } = useNoteEditor();
 
     return (
         <div className={styles.notes}>
-            <NoteEditorControls search={search} setSearch={setSearch} isError={isError} inflatedNotes={inflatedNotes} id={typeof id == "string" ? id : null} />
-            {note && <NoteEditorMain note={note} setNote={setNote} save={save} />}
+            <NoteEditorControls isLoading={areNotesLoading} search={search} setSearch={setSearch} isError={isError} inflatedNotes={inflatedNotes} id={typeof id == "string" ? id : null} />
+            {note && <NoteEditorMain note={note} setNote={setNote} saveNote={saveNote} deleteNote={deleteNote} />}
         </div>
     )
 }

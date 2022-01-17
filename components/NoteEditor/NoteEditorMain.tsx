@@ -5,11 +5,12 @@ import styles from './styles/NoteEditorMain.module.css'
 
 type RightColumnProps = {
     note: InflatedNote
-    setNote: {(note: InflatedNote): void},
-    save: {(): void}
+    setNote: {(note: InflatedNote): void}
+    saveNote: {(): void}
+    deleteNote: {(): void}
 }
 
-const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, save }) => {
+const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, deleteNote }) => {
     return (
         <div className={styles.right}>
             <div className={styles.title}>
@@ -18,7 +19,10 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, save }) => 
             <div className={styles.content}>
                 <Editor editorState={note.content} onChange={(e) => setNote({ ...note, content: e })} placeholder="Content" />
             </div>
-            <Button type="primary" handleClick={save}>Save</Button>
+            <div className={styles.buttons}>
+                <Button type="primary" handleClick={saveNote}>Save</Button>
+                <Button type="secondary" handleClick={deleteNote}>Delete</Button>
+            </div>
         </div>
     )
 }

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import useGetInflatedNotes from "../../../hooks/useGetInflatedNotes";
 import useRedirectAnon from "../../../hooks/useRedirectAnon";
-import { useCreateNoteMutation, useUpdateNoteMutation, useGetNoteQuery } from "../../../redux/noteApi";
+import { useCreateNoteMutation, useUpdateNoteMutation, useGetNoteQuery, useDeleteNoteMutation } from "../../../redux/noteApi";
 import { InflatedNote } from "../../../redux/types";
 import { getDefaultInflatedNote, inflateNote, serialiseNote } from "../../../utils/note";
 
@@ -22,7 +22,8 @@ function useNoteEditor() {
     // mutations
     const [createNote, { isLoading: isCreating, isSuccess: isCreated, data: createdNote }] = useCreateNoteMutation();
     const [updateNote, { isLoading: isUpdating, isSuccess: isUpdated, data: updatedNote }] = useUpdateNoteMutation();
-    
+    const [deleteNoteAction, { isSuccess: isDeleted }] = useDeleteNoteMutation();
+
     const [note, setNote] = useState<InflatedNote>();
 
 
@@ -45,7 +46,7 @@ function useNoteEditor() {
         }
     }, [createdNote])
 
-    function save() {
+    function saveNote() {
         if (!note) {
             return
         }
@@ -56,15 +57,32 @@ function useNoteEditor() {
         updateNote(noteToSave);
     }
 
+    function deleteNote() {
+        if (!note) {
+            return
+        }
+        
+        const noteToDelete = serialiseNote(note);
+        deleteNoteAction(noteToDelete);
+    }
+
+    useEffect(() => {
+        if (isDeleted) {
+            router.push("/notes");
+        }
+    }, [isDeleted])
+
     return {
         search,
         setSearch,
         isError,
         inflatedNotes,
+        areNotesLoading: isLoading,
         id,
         note,
         setNote,
-        save
+        saveNote,
+        deleteNote
     }
 }
 

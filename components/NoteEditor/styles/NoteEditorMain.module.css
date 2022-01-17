@@ -43,3 +43,8 @@
     overflow-y: auto;
     margin-bottom: 2rem;
 }
+
+.buttons {
+    display: flex;
+    gap: 1rem;
+}

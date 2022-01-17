@@ -1,6 +1,7 @@
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import React from "react";
 import { SerialisedNote } from "../../redux/noteApi";
 import { InflatedNote } from "../../redux/types";
 import NoteCard, { InflatedNoteCard } from "../Note/NoteCard";
@@ -10,11 +11,12 @@ type LeftColumnProps = {
     search: string
     setSearch: { (s: string): void }
     isError: boolean
+    isLoading: boolean
     inflatedNotes: (SerialisedNote | InflatedNote)[]
     id?: string | null
 }
 
-const NoteEditorControls: React.FC<LeftColumnProps> = ({ search, setSearch, isError, inflatedNotes, id }) => {
+const NoteEditorControls: React.FC<LeftColumnProps> = ({ search, setSearch, isError, inflatedNotes, id, isLoading }) => {
     const session = useSession();
     const router = useRouter();
 
@@ -27,18 +29,24 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ search, setSearch, isEr
             <Link href="/notes">Create</Link>
         </div>
         <div className={styles.notesList}>
-            {session.status == "loading" ?
-                <p>Loading user...</p> :
+            {
+                session.status == "loading" ?
+                <Message>Loading user...</Message> :
                 isError ?
-                    <p>Error</p> :
-                    inflatedNotes.length ?
-                        <NoteList notes={inflatedNotes} pathname={router.pathname} selected={typeof id == "string" ? parseInt(id) : 0} /> :
-                        <p>Loading notes...</p>}
+                <Message>Error</Message> :
+                inflatedNotes.length ?
+                <NoteList notes={inflatedNotes} pathname={router.pathname} selected={typeof id == "string" ? parseInt(id) : 0} /> :
+                isLoading ?
+                <Message>Loading notes...</Message> :
+                <Message>No notes</Message>
+            }
         </div>
     </div>;
 }
 
 export default NoteEditorControls;
+
+const Message: React.FC = ({ children }) => <div className={styles.message}><p>{children}</p></div>
 
 type Props = {
     notes: (SerialisedNote | InflatedNote)[],
