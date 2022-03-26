@@ -35,7 +35,7 @@ const Notes: NextPage = () => {
     }
 
     return (
-        <Block className={mobile ? "p-0" : ""}>
+        <Block noPadding={mobile ? true : false}>
             <NoteEditor id={id ? parseInt(id) : undefined} isSuccess={isSuccess} isDeleted={isDeleted} />
         </Block>
     )

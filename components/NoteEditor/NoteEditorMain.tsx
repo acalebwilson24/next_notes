@@ -25,8 +25,8 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
             <div className={styles.content}>
                 <Editor editorState={note.content} onChange={(e) => setNote({ ...note, content: e })} placeholder="Content" />
             </div>
-            <div className="flex gap-4 fixed bottom-0 w-full mb-4 z-10" ref={buttonsRef}>
-                <Button type="primary" handleClick={saveNote}>Save</Button>
+            <div className="flex gap-4 fixed bottom-0 w-full mb-4 z-10 md:static md:mt-auto" ref={buttonsRef}>
+                <Button type="primary" handleClick={(e) => { e.preventDefault(); saveNote(); }}>Save</Button>
                 <Button type="secondary" handleClick={deleteNote}>Delete</Button>
             </div>
             {mobile && buttonsRef.current && <div style={{ height: buttonsRef.current.offsetHeight }} />}

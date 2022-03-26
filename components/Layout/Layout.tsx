@@ -6,13 +6,13 @@ type Props = {
     width?: "standard" | "narrow",
     backgroundColor?: "primary" | "secondary" | string,
     color?: "white" | "black"
-    className?: string
+    noPadding?: boolean,
 }
 
-export const Block: React.FC<Props> = ({ children, width = "standard", backgroundColor, color, className }) => {
+export const Block: React.FC<Props> = ({ children, width = "standard", backgroundColor, color, noPadding }) => {
 
     return (
-        <div className={`p-4 ${className}`}>
+        <div className={noPadding ? "p-0" : "p-4"}>
             <div className="max-w-7xl mx-auto">
                 {children}
             </div>
