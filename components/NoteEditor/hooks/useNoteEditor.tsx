@@ -7,29 +7,39 @@ import { useCreateNoteMutation, useUpdateNoteMutation, useGetNoteQuery, useDelet
 import { InflatedNote } from "../../../redux/types";
 import { getDefaultInflatedNote, inflateNote, serialiseNote } from "../../../utils/note";
 
-function useNoteEditor() {
-    const session = useSession();
-    const router = useRouter();
-    const { id } = router.query;
-    useRedirectAnon();
+// on navigate to desktop, create new note for editor, unless id is set in which case fetch note
+// on navigate to mobile, create no note, wait for selection or new note button, or id is set in which case fetch note and switch to editor
+
+
+function useNoteEditor(id?: number, newNote?: boolean) {
 
     const [search, setSearch] = useState("")
 
     // data
     const { inflatedNotes, isLoading, isError } = useGetInflatedNotes();
-    const { data: serialisedNote, isError: isNoteError } = useGetNoteQuery(typeof id == "string" ? id : 0, { skip: !session.data?.user })
+    const { data: serialisedNote, isError: isNoteError } = useGetNoteQuery(id ? id : 0, { skip: !id });
 
     // mutations
     const [createNote, { isLoading: isCreating, isSuccess: isCreated, data: createdNote }] = useCreateNoteMutation();
     const [updateNote, { isLoading: isUpdating, isSuccess: isUpdated, data: updatedNote }] = useUpdateNoteMutation();
     const [deleteNoteAction, { isSuccess: isDeleted }] = useDeleteNoteMutation();
 
+    // local note
     const [note, setNote] = useState<InflatedNote>();
 
+    function createNewNote() {
+        setNote(getDefaultInflatedNote());
+    }
 
+    function clearNote() {
+        setNote(undefined);
+    }
+
+    // turns fetch data into inflated note
     useEffect(() => {
-        if (!id) {
-            return setNote(getDefaultInflatedNote())
+        if (!id && note && note.id !== -1) {
+            clearNote();
+            return
         }
 
         if (serialisedNote) {
@@ -37,14 +47,9 @@ function useNoteEditor() {
             if (inflatedNote) {
                 setNote(inflatedNote)
             }
-        }
+        } 
     }, [serialisedNote, isLoading, id])
 
-    useEffect(() => {
-        if (createdNote) {
-            router.push(`${router.pathname}?id=${createdNote.id}`)
-        }
-    }, [createdNote])
 
     function saveNote() {
         if (!note) {
@@ -66,12 +71,6 @@ function useNoteEditor() {
         deleteNoteAction(noteToDelete);
     }
 
-    useEffect(() => {
-        if (isDeleted) {
-            router.push("/notes");
-        }
-    }, [isDeleted])
-
     return {
         search,
         setSearch,
@@ -82,7 +81,12 @@ function useNoteEditor() {
         note,
         setNote,
         saveNote,
-        deleteNote
+        deleteNote,
+        createdNote,
+        isDeleted,
+        createNewNote,
+        clearNote,
+        isLoading
     }
 }
 

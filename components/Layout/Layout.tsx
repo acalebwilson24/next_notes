@@ -1,33 +1,19 @@
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/configureStore";
 import Header from "../Header"
 
 type Props = {
-    width: "standard" | "narrow",
+    width?: "standard" | "narrow",
     backgroundColor?: "primary" | "secondary" | string,
     color?: "white" | "black"
+    className?: string
 }
 
-export const Block: React.FC<Props> = ({ children, width, backgroundColor, color }) => {
-    let background = "";
-    switch (backgroundColor) {
-        case "primary":
-            background = "rgb(71 131 127)";
-            break;
-        case "secondary":
-            background = "whitesmoke";
-            break;
-        default: 
-            background = backgroundColor || ""; 
-    }
+export const Block: React.FC<Props> = ({ children, width = "standard", backgroundColor, color, className }) => {
 
     return (
-        <div style={{ padding: "2rem 1rem", backgroundColor: background, color: color ? color : "black" }}>
-            <div style={
-                {  
-                    maxWidth: width == "standard" ? "1200px" : "800px", 
-                    margin: "0 auto", 
-                    display: "flex", 
-                    flexDirection: "column",
-                }}>
+        <div className={`p-4 ${className}`}>
+            <div className="max-w-7xl mx-auto">
                 {children}
             </div>
         </div>
@@ -35,11 +21,25 @@ export const Block: React.FC<Props> = ({ children, width, backgroundColor, color
 
 }
 
-const Layout: React.FC = ({ children }) => (
-    <div style={{ backgroundColor: "whitesmoke", minHeight: "100vh" }}>
-        <Header links={[ { label: "Home", link: "/" } ]} />
-        { children }
-    </div>
-)
+const Layout: React.FC = ({ children }) => {
+    return (
+        <div className="bg-slate-50 dark:bg-slate-900 min-h-screen">
+            <Header links={[ { label: "Home", link: "/" } ]} />
+            { children }
+        </div>
+    )
+}
+
+export const ScrollView: React.FC = ({ children }) => {
+    return (
+        <div className="h-full relative" >
+            <div className="top-0 left-0 w-full h-full absolute overflow-y-auto">
+                {children}
+            </div>
+        </div>
+    )
+}
+
+
 
 export default Layout;

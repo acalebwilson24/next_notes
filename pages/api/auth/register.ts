@@ -8,7 +8,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<User | string>
 ) {
-    console.log(req.body);
+    // console.log(req.body);
     if (!(req.body.email && req.body.password)) {
         return res.send("Invalid POST");
     }

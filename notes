@@ -1,9 +1,0 @@
-getStaticProps - for truly static page data which will not change between builds
-getServerSideProps - 
-
-
-NextJS Approaches - 
-Static Generation - use for pages with no data which will change regularly (fastest, can be cached easily)
-Static Generation + Client-Side Rendering - skip pre-rendering for certain parts of the page and populate on the Client. Seems like default behaviour when 
-                                            rendering pages with client-side fetching.
-Server-Side rendering - fetches data on each request and renders on server, sending html file 

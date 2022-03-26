@@ -1,132 +1,45 @@
-import { Note, PrismaClient, User } from '@prisma/client';
-import type { GetServerSideProps, GetStaticProps, NextPage } from 'next'
-import { signIn, signOut, useSession } from 'next-auth/react';
-import Link from 'next/dist/client/link';
-import Head from 'next/head'
-import Image from 'next/image'
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import Header from '../components/Header';
-import { Block } from '../components/Layout/Layout';
-import { prisma } from '../prisma/client';
-import { set } from '../redux/slices/titleSlice';
-import styles from '../styles/Home.module.css'
-import { NextSeo } from 'next-seo'
-import { inflateNote, serialiseNoteFromDB } from '../utils/note';
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { NextPage } from "next/types";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { Block } from "../components/Layout/Layout";
+import NoteEditor from "../components/NoteEditor/NoteEditor";
+import { RootState } from "../redux/configureStore";
+import "/node_modules/draft-js/dist/Draft.css";
 
+const Notes: NextPage = () => {
+    const router = useRouter();
+    const { id, type } = router.query as { id?: string, type?: string };
+    const mobile = useSelector((state: RootState) => state.mobile);
+    const { data, status } = useSession();
 
-type SerialisedNote = Pick<Note, "authorID" | "content" | "id" | "title"> & { createdAt: string, updatedAt: string };
-
-export const getServerSideProps: GetServerSideProps = async () => {
-
-  const users = await prisma.user.findMany({
-    include: {
-      notes: true
-    }
-  });
-
-  const notes = await prisma.note.findMany();
-
-  return {
-    props: {
-      users: users.map(u => {
-        return {
-          ...u,
-          notes: u.notes.map(n => serialiseNoteFromDB(n))
+    function isSuccess(id?: number) {
+        if (id) {
+            router.push("/?id=" + id);
         }
-      }),
-      notes: notes.map(n => serialiseNoteFromDB(n))
     }
-  }
-}
 
-type Props = {
-  users: (User & { notes: SerialisedNote[] })[]
-  notes: SerialisedNote[]
-}
-
-type LinkType = {
-  label: string
-  slug: string
-};
-
-const Home: NextPage<Props> = ({ users, notes }) => {
-
-  const { data: session } = useSession();
-  const dispatch = useDispatch();
-
-  const linkTypes: LinkType[] = [
-    {
-      label: "Static",
-      slug: "static"
-    },
-    {
-      label: "Server Side",
-      slug: "server-side"
-    },
-    {
-      label: "Static With Client",
-      slug: "static-with-client"
-    },
-    {
-      label: "Client Side",
-      slug: "client"
+    function isDeleted() {
+        router.push("/");
     }
-  ]
 
-  useEffect(() => {
-    dispatch(set("Note App"));
-  }, [])
+    if (status == "loading") {
+        return <div>Loading...</div>
+    } else if (status == "unauthenticated") {
+        return (
+            <Block>
+                <p>Please <span className="text-sky-700 font-semibold underline cursor-pointer" onClick={() => signIn()}>sign in</span> to create notes</p>
+            </Block>
+        )
+    }
 
-  return (
-    <>
-      <NextSeo title='Home' />
-      <Block width="standard">
-        {session ?
-          <div className={styles.user}>
-            <p>Signed in as {session.user?.name}</p>
-            <button onClick={() => signOut()}>Sign Out</button>
-          </div> :
-          <div className={styles.login}>
-            <button onClick={() => signIn()}>Sign In</button>
-          </div>
-        }
-      </Block>
-      <Block width="standard">
-        <h1 style={{marginTop: 0}}>Users</h1>
-        <div className={styles.home}>
-          {users && users.map(u => {
-            return (
-              <div className={styles.userCard} key={u.id}>
-                <p>{u.name?.split(" ")[0]}</p>
-                <div className='notes'>
-                  {u.notes.length > 0 && <h4>Notes</h4>}
-                  <ul>
-                    {u.notes && u.notes.map(n => {
-                      const note = inflateNote(n);
-                      if (note) {
-                        return (
-                        <li key={note.id}>
-                          <h4>{note.title.getCurrentContent().getPlainText()}</h4>
-                          <ul>
-                            {linkTypes.map(l => (
-                              <li key={l.slug + l.label}>
-                                <Link href={`/notes/${l.slug}/${n.id}`}>{l.label}</Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </li>
-                      )}
-                    })}
-                  </ul>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </Block>
-    </>
-  )
+    return (
+        <Block className={mobile ? "p-0" : ""}>
+            <NoteEditor id={id ? parseInt(id) : undefined} isSuccess={isSuccess} isDeleted={isDeleted} />
+        </Block>
+    )
 }
 
-export default Home
+export default Notes;
+

@@ -39,7 +39,7 @@ const NotesPage: NextPage<Props> = ({ note }) => {
 
     useEffect(() => {
         if (isSuccess || isDeleted) {
-            router.push("/notes");
+            router.push("/");
         }
     }, [isSuccess, isDeleted])
 

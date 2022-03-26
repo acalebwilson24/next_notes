@@ -4,37 +4,26 @@ import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '../../../prisma/client';
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import EmailProvider from 'next-auth/providers/email';
 
 const isProduction = process.env.APP_ENV == "prod";
 export default NextAuth({
     adapter: PrismaAdapter(prisma),
     providers: [
-        GithubProvider({
-            clientId: (isProduction ? process.env.GITHUB_PRODUCTION_ID : process.env.GITHUB_ID) || "",
-            clientSecret: (isProduction ? process.env.GITHUB_PRODUCTION_SECRET : process.env.GITHUB_SECRET) || ""
-        }),
         GoogleProvider({
             clientId: (isProduction ? process.env.GOOGLE_PRODUCTION_KEY : process.env.GOOGLE_KEY) || "",
             clientSecret: (isProduction ? process.env.GOOGLE_PRODUCTION_SECRET : process.env.GOOGLE_SECRET) || ""
-        })
-        // CredentialsProvider({
-        //     name: "Credentials",
-        //     credentials: {
-        //         email: { label: "Email", type: "text", placeholder: "example@example.com" },
-        //         password: { label: "Password", type: "password" }
-        //     },
-        //     async authorize(credentials, req) {
-        //         if (!credentials) {
-        //             return null;
-        //         }
-        //         const user = await prisma.user.findUnique({where: { email: credentials.email }})
-        //         if (user) {
-        //             console.log(user);
-        //             return user;
-        //         }
-        //         return null;
-        //     }
-        // })
+        }),
+        EmailProvider({
+            server: {
+                service: "Gmail",
+                auth: {
+                    user: "a.caleb.wilson@gmail.com",
+                    pass: "espndiwqfcwfkdgd"
+                }
+            },
+            from: process.env.EMAIL_FROM
+        }),
     ],
     callbacks: {
         // a bit jank but it works

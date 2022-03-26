@@ -28,7 +28,6 @@ apiRoute.post(async (req, res, next) => {
     next()
 
 }, upload.single("profilePicture"), async (req, res) => {
-    console.log(req.file);
 
     const session = await getSession({ req });
     if (!session) {
