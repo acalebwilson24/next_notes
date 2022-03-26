@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 8083 && APP_ENV=dev",
-    "build": "npm list && ls ./node_modules/babel-plugin-superjson-next/ && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
