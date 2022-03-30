@@ -49,7 +49,7 @@ const Header: React.FC<Props> = ({ links }) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             </Head>
             <div ref={headerRef} className="bg-white px-4 py-4 shadow-lg shadow-slate-700/5 dark:bg-slate-800 fixed md:static w-full z-40">
-                <div className="mx-auto max-w-7xl flex justify-between">
+                <div className="mx-auto flex justify-between">
                     <Link href="/" passHref><a className="block text-lg font-semibold">Note App</a></Link>
                     {mobile && <MenuButton open={() => dispatch(openMenu())} />}
                     <Menu show={menu} mobile={mobile || false}>
@@ -63,7 +63,7 @@ const Header: React.FC<Props> = ({ links }) => {
                                 <li style={{ cursor: "pointer" }} onClick={() => signIn()}>Sign In</li>
                             }
                         </ul>
-                        <button onClick={() => dispatch(closeMenu())}>Close</button>
+                        {mobile &&<button onClick={() => dispatch(closeMenu())}>Close</button>}
                     </Menu>
                 </div>
             </div>

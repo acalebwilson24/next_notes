@@ -1,7 +1,7 @@
 import { Note } from "@prisma/client";
 import { EditorState, convertFromRaw, RawDraftContentState, convertToRaw } from "draft-js";
 import { SerialisedNote } from "../redux/noteApi";
-import { InflatedNote } from "../redux/types";
+import { InflatedNote, NoteAPIRequest, NoteAPIResponse } from "../redux/types";
 
 export function createEditorStateFromString(state: string) {
     try {
@@ -15,7 +15,7 @@ export function convertEditorStateToString(state: EditorState) {
     return JSON.stringify(convertToRaw(state.getCurrentContent()));
 }
 
-export function inflateNote(note: SerialisedNote) {
+export function inflateNote(note: NoteAPIResponse): InflatedNote {
     let newNote: InflatedNote;
     newNote = {
         ...note,
@@ -27,12 +27,12 @@ export function inflateNote(note: SerialisedNote) {
     return newNote;
 }
 
-export function serialiseNote(note: InflatedNote) {
-    let newNote = {
+export function serialiseNote(note: InflatedNote): NoteAPIRequest {
+    let newNote: NoteAPIRequest = {
         ...note,
         title: convertEditorStateToString(note.title),
         content: convertEditorStateToString(note.content)
-    } as Note
+    }
     return newNote;
 }
 
@@ -51,7 +51,8 @@ export function getDefaultInflatedNote() {
         createdAt: new Date(),
         updatedAt: new Date(),
         title: EditorState.createEmpty(),
-        content: EditorState.createEmpty()
+        content: EditorState.createEmpty(),
+        tags: []
     } as InflatedNote
 }
 
@@ -64,6 +65,6 @@ export function isJSONStr(str: string) {
     return true;
 }
 
-export function inflateNotes(notes: SerialisedNote[]) {
+export function inflateNotes(notes: NoteAPIResponse[]) {
     return notes.filter(n => n.title && isJSONStr(n.title)).map(n => inflateNote(n));
 }

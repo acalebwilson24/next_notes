@@ -9,7 +9,7 @@ type Props = {
     noPadding?: boolean,
 }
 
-export const Block: React.FC<Props> = ({ children, width = "standard", backgroundColor, color, noPadding }) => {
+export const PageBlock: React.FC<Props> = ({ children, width = "standard", backgroundColor, color, noPadding }) => {
 
     return (
         <div className={noPadding ? "p-0" : "p-4"}>
@@ -23,19 +23,11 @@ export const Block: React.FC<Props> = ({ children, width = "standard", backgroun
 
 const Layout: React.FC = ({ children }) => {
     return (
-        <div className="bg-slate-50 dark:bg-slate-900 min-h-screen">
+        <div className="bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col">
             <Header links={[ { label: "Home", link: "/" } ]} />
-            { children }
-        </div>
-    )
-}
-
-export const ScrollView: React.FC = ({ children }) => {
-    return (
-        <div className="h-full relative" >
-            <div className="top-0 left-0 w-full h-full absolute overflow-y-auto">
-                {children}
-            </div>
+            <main className="flex-grow">
+                { children }
+            </main>
         </div>
     )
 }

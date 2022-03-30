@@ -57,7 +57,7 @@ function useNoteEditor(id?: number, newNote?: boolean) {
         }
         const noteToSave = serialiseNote(note);
         if (note.id == -1) {
-            createNote(noteToSave);
+            return createNote(noteToSave);
         }
         updateNote(noteToSave);
     }
@@ -69,6 +69,27 @@ function useNoteEditor(id?: number, newNote?: boolean) {
         
         const noteToDelete = serialiseNote(note);
         deleteNoteAction(noteToDelete);
+    }
+
+    function addTag(tag: string) {
+        if (!note) {
+            return
+        }
+        const newNote = { ...note, tags: [...note.tags, tag] };
+        newNote.tags.sort();
+
+        setNote(newNote);
+    }
+
+    function removeTag(tag: string) {
+        if (!note) {
+            return
+        }
+
+        const newNote = { ...note, tags: note.tags.filter(t => t !== tag) };
+        newNote.tags.sort();
+
+        setNote({ ...note, tags: note.tags.filter(t => t !== tag) })
     }
 
     return {
@@ -86,7 +107,9 @@ function useNoteEditor(id?: number, newNote?: boolean) {
         isDeleted,
         createNewNote,
         clearNote,
-        isLoading
+        isLoading,
+        addTag,
+        removeTag
     }
 }
 

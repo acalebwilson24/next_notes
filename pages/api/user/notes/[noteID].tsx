@@ -13,14 +13,14 @@ export default async function handler(
         res.send("No session")
     }
 
-    const { id } = req.query;
+    const { noteID } = req.query;
 
-    if (!(typeof id === "string")) {
+    if (!(typeof noteID === "string")) {
         return res.send("Invalid id")
     }
     const note = await prisma.note.findUnique({
         where: {
-            id: parseInt(id)
+            id: parseInt(noteID)
         }
     })
 

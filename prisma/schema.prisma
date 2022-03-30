@@ -7,15 +7,15 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-
 model Note {
     id        Int      @id @default(autoincrement())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    title     String?   @db.MediumText
+    title     String?  @db.MediumText
     content   String?  @db.MediumText
-    author    User     @relation(fields: [authorID], references: [id])
+    author    User     @relation(fields: [authorID], references: [id], onDelete: Cascade)
     authorID  Int
+    tags      Tag[]
 }
 
 model User {
@@ -27,7 +27,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    notes          Note[]
+    notes         Note[]
 }
 
 model Session {
@@ -65,4 +65,12 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Tag {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String   @db.VarChar(255) @unique
+    notes     Note[]
 }

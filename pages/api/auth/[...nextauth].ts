@@ -40,7 +40,7 @@ export default NextAuth({
     },
     events: {
       signIn: (message) => {
-          console.log(message);
+        //   console.log(message);
       }  
     },
     secret: process.env.SECRET

@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { NextPage } from "next/types";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { Block } from "../components/Layout/Layout";
+import { PageBlock } from "../components/Layout/Layout";
 import NoteEditor from "../components/NoteEditor/NoteEditor";
 import { RootState } from "../redux/configureStore";
 import "/node_modules/draft-js/dist/Draft.css";
@@ -28,16 +28,16 @@ const Notes: NextPage = () => {
         return <div>Loading...</div>
     } else if (status == "unauthenticated") {
         return (
-            <Block>
+            <PageBlock>
                 <p>Please <span className="text-sky-700 font-semibold underline cursor-pointer" onClick={() => signIn()}>sign in</span> to create notes</p>
-            </Block>
+            </PageBlock>
         )
     }
 
     return (
-        <Block noPadding={mobile ? true : false}>
+        <PageBlock noPadding={mobile ? true : false}>
             <NoteEditor id={id ? parseInt(id) : undefined} isSuccess={isSuccess} isDeleted={isDeleted} />
-        </Block>
+        </PageBlock>
     )
 }
 
