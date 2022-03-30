@@ -81,6 +81,8 @@ type AutoCompleteProps = {
 
 
 // need to add keyboard select options
+// return { name: string, count: number } from tags endpoint 
+// to allow ordering suggestions by frequency
 const AutoComplete: FC<AutoCompleteProps> = ({ suggestions, placeholder, onChange, value, onSubmit }) => {
     const [ showSuggestions, setShowSuggestions ] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
