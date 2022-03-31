@@ -23,13 +23,10 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
     const [ updateNote ] = useUpdateNoteMutation();
     const [ deleteNote ] = useDeleteNoteMutation();
 
-
-    const mobile = useSelector((state: RootState) => state.mobile);
-
     return (
         <div className="h-full w-full grid grid-cols-[400px_auto] absolute bg-white dark:bg-slate-800 rounded-lg divide-x divide-slate-300 dark:divide-slate-600 shadow-lg shadow-slate-700/5 overflow-hidden">
             <div>
-                <NoteEditorControls id={id} mobile={false} setNoteID={setNoteID} createNewNote={() => { setNoteID(undefined); setNote(getDefaultInflatedNote()); } } />
+                <NoteEditorControls id={noteID} mobile={false} setNoteID={setNoteID} createNewNote={() => { setNoteID(undefined); setNote(getDefaultInflatedNote()); } } />
             </div>
             <div className="flex justify-center overflow-auto">
                 <div className="w-full max-w-5xl">

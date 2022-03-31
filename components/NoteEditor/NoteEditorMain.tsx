@@ -6,6 +6,8 @@ import { useGetTagsQuery } from "../../redux/noteApi"
 import { InflatedNote, TagAPIResponse } from "../../redux/types"
 import { filterTags } from "../../utils/tag"
 import Button from "../Button/Button"
+import TagAutoComplete from "../TagAutoComplete"
+import TagButton from "../TagButton"
 import styles from './styles/NoteEditorMain.module.css'
 
 type RightColumnProps = {
@@ -52,84 +54,6 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
                 <Button type="secondary" handleClick={deleteNote}>Delete</Button>
             </div>
             {mobile && buttonsRef.current && <div style={{ height: buttonsRef.current.offsetHeight }} />}
-        </div>
-    )
-}
-
-const TagButton: FC<{ deleteTag: { (): void } }> = ({ children, deleteTag }) => {
-    return (
-        <div className="bg-sky-100 hover:bg-sky-200 py-1 px-2 rounded-md cursor-pointer" onClick={deleteTag}>{children}</div>
-    )
-}
-
-type AutoCompleteProps = {
-    suggestions: TagAPIResponse[]
-    value: string
-    onChange: { (value: string): void }
-    placeholder?: string
-    onSubmit: (value: string) => void
-    isFetching?: boolean
-}
-
-
-// need to add keyboard select options
-// return { name: string, count: number } from tags endpoint 
-// to allow ordering suggestions by frequency
-export const TagAutoComplete: FC<AutoCompleteProps> = ({ suggestions, placeholder, onChange, value, onSubmit, isFetching }) => {
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const inputRef = useRef<HTMLInputElement | null>(null);
-
-    useEffect(() => {
-        window.addEventListener('click', handleClickOutside);
-    })
-
-    function handleClickOutside(e: MouseEvent) {
-        if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
-            setShowSuggestions(false);
-        }
-    }
-
-    function handleEnter(e: React.KeyboardEvent<HTMLInputElement>) {
-        // e.preventDefault();
-        if (e.key == "Enter") {
-            onSubmit(value);
-        }
-    }
-
-
-    function handleSelectSuggestion(suggestion: string) {
-        onChange(suggestion);
-        setTimeout(() => {
-            onSubmit(suggestion);
-        }, 10)
-        setShowSuggestions(false);
-    }
-
-    function handleEnterSuggestion(e: React.KeyboardEvent<HTMLElement>, value: string) {
-        if (e.key == "Enter") {
-            handleSelectSuggestion(value);
-        }
-    }
-
-    return (
-        <div className="relative" ref={inputRef}>
-            <input type="text" onClick={() => setShowSuggestions(true)} onFocus={() => setShowSuggestions(true)} value={value} onKeyDown={handleEnter} onChange={(e) => onChange(e.target.value)} className="py-1 px-2 focus:outline-slate-400 focus:outline-1 border-b border-slate-300" placeholder={placeholder} />
-            {
-                showSuggestions &&
-                (
-                    <ul className="absolute z-20 flex flex-col w-full border border-slate-300 divide-y divide-slate-300 bg-white" >
-                        {isFetching ? <li className="py-2 px-2">Loading tags...</li> : suggestions.map((s, i) => (
-                            <li
-                                tabIndex={0}
-                                className=" py-2 px-2 cursor-pointer hover:bg-sky-50"
-                                key={i}
-                                onClick={() => handleSelectSuggestion(s.tag)}
-                                onKeyDown={(e) => handleEnterSuggestion(e, s.tag)}
-                            >{s.tag} - {s.count}</li>
-                        ))}
-                    </ul>
-                )
-            }
         </div>
     )
 }
