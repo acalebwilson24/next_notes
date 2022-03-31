@@ -24,28 +24,43 @@ export default async function handler(
 
         const otherTags = await prisma.tag.findMany({
             where: {
+                // filter out tags that are already in the list
+                NOT: tags && [
+                    ...tags.map(t => {
+                        const where: Prisma.TagWhereInput = {
+                            name: {
+                                equals: t
+                            }
+                        };
+                        return where;
+                    })
+                ],
                 AND: [
-                    // only gets tags which the user has used
+                    // only gets tags which are present with the query tags
                     {
                         notes: {
                             some: {
-                                authorID: userID
-                            }
-                        },
-                    },
-                    // only gets tags which are present with the query tags
-                    ...tags.map(tag => ({
-                            notes: {
-                                some: {
-                                    tags: {
-                                        some: {
-                                            name: tag
-                                        }
+                                AND: [
+                                    ...tags.map(t => {
+                                        const where: Prisma.NoteWhereInput = {
+                                            tags: {
+                                                some: {
+                                                    name: {
+                                                        equals: t
+                                                    }
+                                                }
+                                            }
+                                        };
+                                        return where;
+                                    }),
+                                    // only get tags the user has used
+                                    {
+                                        authorID: userID
                                     }
-                                }
+                                ]
                             }
-                        }) 
-                    )
+                        }
+                    }
                 ]
             }
         })
