@@ -31,7 +31,7 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
     const filteredTags = allTags && filterTags(allTags, note.tags, tag) || [];
 
     return (
-        <div className="flex flex-col md:min-h-[700px] p-4 pt-0 md:pt-4">
+        <div className="flex flex-col h-full p-4 pt-0 md:pt-4">
             <div className="flex gap-2 items-center text-sm">
                 <div className="flex items-center gap-2">
                     {note.tags && note.tags.map((tag, i) => <TagButton key={tag} deleteTag={() => removeTag(tag)}>{tag}</TagButton>)}

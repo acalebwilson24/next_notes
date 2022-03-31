@@ -25,7 +25,7 @@ const Layout: React.FC = ({ children }) => {
     return (
         <div className="bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col">
             <Header links={[ { label: "Home", link: "/" } ]} />
-            <main className="flex-grow">
+            <main className="flex-grow flex flex-col">
                 { children }
             </main>
         </div>

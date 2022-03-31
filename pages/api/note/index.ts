@@ -100,8 +100,6 @@ const notesOptionsDefault: GetNotesOptions = {
 async function getNotes(userID: number, options = notesOptionsDefault): Promise<NoteAPIResponse[] | undefined> {
     const { search, tags } = options;
 
-    console.log(search, tags);
-
     const where: Prisma.NoteWhereInput = {
         authorID: userID,
         AND: tags ? [

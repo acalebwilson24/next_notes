@@ -35,9 +35,9 @@ const Notes: NextPage = () => {
     }
 
     return (
-        <PageBlock noPadding={mobile ? true : false}>
+        <div className="h-full flex-grow relative">
             <NoteEditor id={id ? parseInt(id) : undefined} isSuccess={isSuccess} isDeleted={isDeleted} />
-        </PageBlock>
+        </div>
     )
 }
 

@@ -9,8 +9,8 @@ export const noteApi = createApi({
     tagTypes: ["Notes", "Note", "Tags"],
     baseQuery: fetchBaseQuery({ baseUrl: "/api"}),
     endpoints: (builder) => ({
-        getNote: builder.query<NoteAPIResponse, number | string>({
-            query: (id) => `/note/${id}`,
+        getNote: builder.query<NoteAPIResponse, number | string | undefined>({
+            query: (id) => `/note/${id || 0}`,
             providesTags: (result, error, id) => [{ type: "Note", id }] 
         }),
         getNotes: builder.query<NoteAPIResponse[], { tags?: string[], search?: string }>({

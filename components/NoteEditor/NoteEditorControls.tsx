@@ -2,53 +2,53 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
-import { SerialisedNote, useGetTagsQuery } from "../../redux/noteApi";
+import useDelaySearch from "../../hooks/useDelaySearch";
+import { SerialisedNote, useGetNotesQuery, useGetTagsQuery } from "../../redux/noteApi";
 import { InflatedNote, TagAPIResponse } from "../../redux/types";
+import { inflateNotes } from "../../utils/note";
 import { filterTags } from "../../utils/tag";
 import InflatedNoteCard from "../Note/NoteCard";
 import TagButton from "../TagButton";
+import { useNoteSearch } from "./hooks/useNoteEditor";
 import { TagAutoComplete } from "./NoteEditorMain";
 import styles from './styles/NoteEditorControls.module.css';
 
 type LeftColumnProps = {
-    search: string
-    setSearch: { (s: string): void }
-    isError: boolean
-    isLoading: boolean
-    inflatedNotes: (SerialisedNote | InflatedNote)[]
     id?: number
     mobile: boolean
-    createNewNote: {(): void}
-    tags: string[],
-    setTags: {(t: string[]): void}
+    setNoteID: {(id: number): void}
+    createNewNote: () => void
 }
 
-const NoteEditorControls: React.FC<LeftColumnProps> = ({ search, setSearch, isError, inflatedNotes, id, isLoading, mobile, createNewNote, tags, setTags: _setTags }) => {
+const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, createNewNote }) => {
+    const noteSearch = useNoteSearch();
+    const { search: _search, setSearch: _setSearch, tags, setTags } = noteSearch;
+    
     const session = useSession();
-    const router = useRouter();
-    const topBarRef = useRef<HTMLDivElement | null>(null)
     const { data: userTags, isFetching } = useGetTagsQuery({ tags }, { skip: !session?.data?.user.id });
 
+    const { searchValue: search, setSearchValue: setSearch } = useDelaySearch(_setSearch);
+    const { data: notes, isLoading, isError } = useGetNotesQuery({ tags, search }, { skip: !session?.data?.user.id });
+    const inflatedNotes = notes ? inflateNotes(notes) : [];
+
     const [newTag, setNewTag] = useState("");
+
+    useEffect(() => {
+        if (notes && !id) {
+            setNoteID(notes[0].id);
+        }
+    }, [notes])
+    
+    // notes && notes.forEach(n => console.log(n.id));
 
     function removeTag(t: string) {
         const newTags = tags.filter(tag => tag !== t);
         setTags(newTags);
     }
-    
-    function setTags(newTags: string[]) {
-        _setTags(newTags);
-    }
-
-    
-    
-    useEffect(() => {
-        console.log(isFetching && "fetching")
-    }, [isFetching])
 
     return (
         <div className={`flex flex-col h-full`}>
-            <div className={mobile ? "w-full" : ""} ref={topBarRef}>
+            <div className={mobile ? "w-full" : ""}>
                 <div className="md:pb-4 p-4 pb-0 flex flex-col gap-2">
                     <label htmlFor="search" className="flex gap-2 items-center">
                         <span className="hidden">Search</span>
@@ -67,7 +67,7 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ search, setSearch, isEr
                 {
                     mobile ? 
                     <button className="fixed bottom-0 right-0 mb-4 mr-4 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md text-xl z-10" onClick={createNewNote}>+</button> :
-                    <Link href="/" passHref><a className="bg-sky-600 text-white dark:bg-sky-700 w-full block text-center py-1">New</a></Link>
+                    <button onClick={createNewNote} className="w-full bg-sky-600 text-white px-2 py-1">New</button>
                 }
             </div>
             <div className="flex-grow h-full relative">
@@ -78,7 +78,7 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ search, setSearch, isEr
                             isError ?
                                 <Message>Error</Message> :
                                 inflatedNotes.length ?
-                                    <NoteList notes={inflatedNotes} pathname={router.pathname} selected={id || 0} /> :
+                                    <NoteList notes={inflatedNotes} selected={id || 0} setNoteID={setNoteID}  /> :
                                     isLoading ?
                                         <Message>Loading notes...</Message> :
                                         <Message>No notes</Message>
@@ -95,18 +95,22 @@ const Message: React.FC = ({ children }) => <div className={styles.message}><p>{
 
 type Props = {
     notes: (SerialisedNote | InflatedNote)[],
-    pathname: string,
     selected?: number
+    setNoteID: {(id: number): void}
 }
 
-const NoteList: React.FC<Props> = ({ notes, pathname, selected }) => {
+const NoteList: React.FC<Props> = ({ notes, selected, setNoteID }) => {
     return (
-        <div className="flex flex-col">
-            {notes.map(n => <Link key={n.id} href={`${pathname}?id=${n.id}`}><a className="border-b border-slate-200 dark:border-slate-600"><NoteListItem {...n} selected={n.id == selected} /></a></Link>) || null}
+        <div className="flex flex-col divide-y divide-slate-200 border-b border-slate-200">
+            {notes.map(n => <NoteListItem key={n.id} {...n} selected={n.id == selected} onClick={() => setNoteID(n.id)} />) || null}
         </div>
     )
 }
 
-const NoteListItem: React.FC<(SerialisedNote | InflatedNote) & { selected: boolean }> = (note) => {
-    return <InflatedNoteCard {...note as InflatedNote} selected={note.selected} />
+const NoteListItem: React.FC<(SerialisedNote | InflatedNote) & { selected: boolean, onClick: () => void }> = ({ onClick, ...note }) => {
+    return (
+        <button onClick={onClick} className="text-left">
+            <InflatedNoteCard {...note as InflatedNote} selected={note.selected} />
+        </button>
+    )
 }
