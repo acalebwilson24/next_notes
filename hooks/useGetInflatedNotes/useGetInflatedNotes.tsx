@@ -1,12 +1,11 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useGetNotesQuery } from "../redux/noteApi"
-import { InflatedNote } from "../redux/types";
-import { inflateNotes } from "../utils/note";
+import { useGetNotesQuery } from "../../redux/noteApi"
+import { InflatedNote } from "../../redux/types";
+import { inflateNotes } from "../../utils/note";
 
-const useGetInflatedNotes = () => {
-    const session = useSession();
-    const { data: notes, isLoading, isError } = useGetNotesQuery(undefined, { skip: !session.data?.user })
+const useGetInflatedNotes = (userID?: number) => {
+    const { data: notes, isLoading, isError } = useGetNotesQuery({  }, { skip: !userID })
 
     const [inflatedNotes, setInflatedNotes] = useState<InflatedNote[]>([])
 
@@ -21,7 +20,6 @@ const useGetInflatedNotes = () => {
         isError,
         isLoading
     }
-
 }
 
 export default useGetInflatedNotes

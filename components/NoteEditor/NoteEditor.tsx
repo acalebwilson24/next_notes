@@ -1,7 +1,7 @@
 import styles from "./styles/NoteEditor.module.css";
 import NoteEditorControls from "./NoteEditorControls";
 import NoteEditorMain from "./NoteEditorMain";
-import useNoteEditor from "./hooks/useNoteEditor";
+import useNoteEditor, { useNoteSearch } from "./hooks/useNoteEditor";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/configureStore";
@@ -10,7 +10,9 @@ import Button from "../Button/Button";
 import { useRouter } from "next/router";
 
 const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, isDeleted: { (): void } }> = ({ id, isSuccess, isDeleted }) => {
-    const { createdNote, isDeleted: noteDeleted, note, ...noteActions } = useNoteEditor(id);
+    const noteSearch = useNoteSearch();
+    const { search, tags } = noteSearch;
+    const { createdNote, isDeleted: noteDeleted, note, ...noteActions } = useNoteEditor({ id, search, queryTags: tags });
     const mobile = useSelector((state: RootState) => state.mobile);
     const router = useRouter();
 
@@ -54,7 +56,7 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
         } else {
             return (
                 <div className="h-full">
-                    <NoteEditorControls {...noteActions} id={id} mobile={true} />
+                    <NoteEditorControls {...noteActions} {...noteSearch} id={id} mobile={true} />
                 </div>
             )
         }
@@ -63,7 +65,7 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
     return (
         <div className="max-h-[700px] bg-white dark:bg-slate-800 rounded-lg grid grid-cols-12 divide-x divide-slate-300 dark:divide-slate-600 shadow-lg shadow-slate-700/5 overflow-hidden">
             <div className="col-span-3 h-full">
-                <NoteEditorControls {...noteActions} id={id} mobile={false} />
+                <NoteEditorControls {...noteActions} {...noteSearch} id={id} mobile={false} />
             </div>
             <div className="col-span-9">
                 {note && <NoteEditorMain note={note} {...noteActions} />}

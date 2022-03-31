@@ -5,22 +5,24 @@ import { SessionProvider } from 'next-auth/react'
 import { Provider, useDispatch, useSelector } from 'react-redux'
 import { RootState, store } from '../redux/configureStore'
 import { DefaultSeo } from 'next-seo'
-import { useEffect } from 'react'
+import { StrictMode, useEffect } from 'react'
 import { setMobile } from '../redux/slices/mobileSlice'
 
 function MyApp({ Component, pageProps: {session, ...pageProps}}: AppProps) {
   return (
     <SessionProvider session={session}>
-      <Provider store={store}>
-        <DefaultSeo titleTemplate="NoteApp | %s" defaultTitle="NoteApp | Notes" />
-        <StyleProvider>
-          <div className="dark:text-white">
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </div>
-        </StyleProvider>
-      </Provider>
+      <StrictMode>
+        <Provider store={store}>
+          <DefaultSeo titleTemplate="NoteApp | %s" defaultTitle="NoteApp | Notes" />
+          <StyleProvider>
+            <div className="dark:text-white">
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </div>
+          </StyleProvider>
+        </Provider>
+      </StrictMode>
     </SessionProvider>
   )
 }

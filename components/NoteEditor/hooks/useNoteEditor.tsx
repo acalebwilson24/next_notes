@@ -1,22 +1,39 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import useGetInflatedNotes from "../../../hooks/useGetInflatedNotes";
+import useGetInflatedNotes from "../../../hooks/useGetInflatedNotes/useGetInflatedNotes";
 import useRedirectAnon from "../../../hooks/useRedirectAnon";
-import { useCreateNoteMutation, useUpdateNoteMutation, useGetNoteQuery, useDeleteNoteMutation } from "../../../redux/noteApi";
+import { useCreateNoteMutation, useUpdateNoteMutation, useGetNoteQuery, useDeleteNoteMutation, useGetNotesQuery } from "../../../redux/noteApi";
 import { InflatedNote } from "../../../redux/types";
-import { getDefaultInflatedNote, inflateNote, serialiseNote } from "../../../utils/note";
+import { getDefaultInflatedNote, inflateNote, inflateNotes, serialiseNote } from "../../../utils/note";
 
 // on navigate to desktop, create new note for editor, unless id is set in which case fetch note
 // on navigate to mobile, create no note, wait for selection or new note button, or id is set in which case fetch note and switch to editor
 
-
-function useNoteEditor(id?: number, newNote?: boolean) {
-
+export function useNoteSearch() {
     const [search, setSearch] = useState("")
+    const [tags, setTags] = useState<string[]>([]);
+
+    return {
+        search,
+        setSearch,
+        tags,
+        setTags
+    }
+}
+
+type UseNoteEditorParams = {
+    id?: number,
+    newNote?: boolean,
+    queryTags?: string[],
+    search?: string
+}
+
+function useNoteEditor(params: UseNoteEditorParams) {
+    const { id, newNote, queryTags, search } = params;
 
     // data
-    const { inflatedNotes, isLoading, isError } = useGetInflatedNotes();
+    const { data: notes, isLoading, isError } = useGetNotesQuery({ tags: queryTags, search });
     const { data: serialisedNote, isError: isNoteError } = useGetNoteQuery(id ? id : 0, { skip: !id });
 
     // mutations
@@ -93,10 +110,8 @@ function useNoteEditor(id?: number, newNote?: boolean) {
     }
 
     return {
-        search,
-        setSearch,
         isError,
-        inflatedNotes,
+        inflatedNotes: notes ? inflateNotes(notes) : [],
         areNotesLoading: isLoading,
         id,
         note,

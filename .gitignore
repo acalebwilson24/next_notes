@@ -39,3 +39,4 @@ yarn-error.log*
 .env
 
 /public/uploads
+mysql_connection_strings

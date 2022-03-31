@@ -1,6 +1,6 @@
 import { Note } from '@prisma/client'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { NoteAPICreateRequest, NoteAPIRequest, NoteAPIResponse } from './types';
+import { NoteAPICreateRequest, NoteAPIRequest, NoteAPIResponse, TagAPIResponse } from './types';
 
 export type SerialisedNote = Omit<Note, "createdAt" | "updatedAt"> & { createdAt: string, updatedAt: string }
 
@@ -13,8 +13,8 @@ export const noteApi = createApi({
             query: (id) => `/note/${id}`,
             providesTags: (result, error, id) => [{ type: "Note", id }] 
         }),
-        getNotes: builder.query<NoteAPIResponse[], undefined>({
-            query: () => "/note",
+        getNotes: builder.query<NoteAPIResponse[], { tags?: string[], search?: string }>({
+            query: ({ tags, search }) => `/note?${tags ? `${convertTagArrayToQueryString(tags)}` : ""}${search ? `search=${search}` : ""}`,
             providesTags: ["Notes"]
         }),
         createNote: builder.mutation<NoteAPIResponse, NoteAPICreateRequest>({
@@ -40,12 +40,23 @@ export const noteApi = createApi({
             }),
             invalidatesTags: ["Notes", "Tags"]
         }),
-        getTags: builder.query<string[], undefined>({
-            query: () => "/tag",
+        getTags: builder.query<TagAPIResponse[], { tags?: string[] }>({
+            query: ({ tags }) => `/tag?${tags && convertTagArrayToQueryString(tags)}`,
             providesTags: ["Tags"]
         })
     })
 })
+
+function convertTagArrayToQueryString(tags: string[]) {
+    let queryStr = "";
+    for (let i = 0; i < tags.length; i++) {
+        queryStr += `tag=${tags[i]}`;
+        if (i < tags.length - 1) {
+            queryStr += "&";
+        }
+    }
+    return queryStr;
+}
 
 export const { 
     useGetNoteQuery, 

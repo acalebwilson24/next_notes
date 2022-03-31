@@ -102,13 +102,15 @@ async function getNotes(userID: number, options = notesOptionsDefault): Promise<
 
     const where: Prisma.NoteWhereInput = {
         authorID: userID,
-        tags: tags ? {
-            some: {
-                name: {
-                    in: tags
+        AND: tags ? [
+            ...tags.map(tag => ({
+                tags: {
+                    some: {
+                        name: tag
+                    }
                 }
-            }
-        } : undefined
+            })) 
+        ] : undefined
     }
 
     const unsearchedNotes = await prisma.note.findMany({
@@ -121,15 +123,7 @@ async function getNotes(userID: number, options = notesOptionsDefault): Promise<
                 updatedAt: "desc"
             }
         ]
-    }).then(notes => {
-        if (notes) {
-            return notes.map(n => mapNoteToResponse(n))
-        }
-    });
-
-    if (!unsearchedNotes) {
-        return;
-    }
+    }).then(notes => notes.filter(n => (tags && tags.length > 0) ? n.tags.length > 0 : true).map(n => mapNoteToResponse(n)));
 
     return searchNotes(unsearchedNotes, search || "");
 }
@@ -139,16 +133,16 @@ async function createNote(note: NoteAPIRequest, userID: number): Promise<NoteAPI
     const { tags } = note;
     const currentTags = (await Promise.all(tags.map(mapTags))).filter(tag => tag !== undefined) as Tag[];
     const newTags = tags.filter(tag => !currentTags.some(currentTag => currentTag.name === tag));
-    
+
     const { title, content } = note;
-    const author = await prisma.user.findUnique({ where: { id: userID }});
+    const author = await prisma.user.findUnique({ where: { id: userID } });
     if (!author) {
         return;
     }
 
     const noteData: Prisma.NoteCreateInput = {
         author: {
-            connect: { id: userID } 
+            connect: { id: userID }
         },
         title,
         content,
