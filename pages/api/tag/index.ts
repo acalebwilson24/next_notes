@@ -6,8 +6,8 @@ import { prisma } from '../../../prisma/client';
 import { TagAPIResponse } from '../../../redux/types';
 
 export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<TagAPIResponse[] | { error: string }>
+    req: NextApiRequest,
+    res: NextApiResponse<TagAPIResponse[] | { error: string }>
 ) {
     const { userID, session } = await getAuth(req);
     if (!userID) {
@@ -16,24 +16,19 @@ export default async function handler(
     // get all user tags
 
     const { tag } = req.query as { tag?: string[] | string };
-    const tags = tag ? parseTags(tag) : [];
+    const filterTags = tag ? parseTags(tag) : [];
 
     if (req.method == "GET") {
-
-        console.log(tags);
 
         const otherTags = await prisma.tag.findMany({
             where: {
                 // filter out tags that are already in the list
-                NOT: tags && [
-                    ...tags.map(t => {
-                        const where: Prisma.TagWhereInput = {
-                            name: {
-                                equals: t
-                            }
-                        };
-                        return where;
-                    })
+                NOT: filterTags && [
+                    ...filterTags.map(t => ({
+                        name: {
+                            equals: t
+                        }
+                    }))
                 ],
                 AND: [
                     // only gets tags which are present with the query tags
@@ -41,18 +36,15 @@ export default async function handler(
                         notes: {
                             some: {
                                 AND: [
-                                    ...tags.map(t => {
-                                        const where: Prisma.NoteWhereInput = {
-                                            tags: {
-                                                some: {
-                                                    name: {
-                                                        equals: t
-                                                    }
+                                    ...filterTags.map(t => ({
+                                        tags: {
+                                            some: {
+                                                name: {
+                                                    equals: t
                                                 }
                                             }
-                                        };
-                                        return where;
-                                    }),
+                                        }
+                                    })),
                                     // only get tags the user has used
                                     {
                                         authorID: userID
@@ -64,7 +56,7 @@ export default async function handler(
                 ]
             }
         })
-        
+
         const tagsWithCounts = await Promise.all(otherTags.map(async tag => {
             // get the count of notes with this tag and passed in tags array
             const count = await prisma.note.count({
@@ -77,7 +69,7 @@ export default async function handler(
                                 }
                             }
                         },
-                        ...tags.map(t => ({
+                        ...filterTags.map(t => ({
                             tags: {
                                 some: {
                                     name: t
@@ -87,12 +79,9 @@ export default async function handler(
                     ]
                 }
             });
-            
+
             return { tag: tag.name, count };
         }))
-
-        console.log(tagsWithCounts);
-
 
         if (!tagsWithCounts) {
             return res.status(404).json({ error: "Tags not found" });
