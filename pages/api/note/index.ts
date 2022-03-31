@@ -54,7 +54,7 @@ export default async function handler(
     if (req.method === "GET") {
         // return a users notes
         const notes = await getNotes(userID, {
-            search: req.query.search as string,
+            search: (req.query.search as string || "").toLowerCase(),
             tags: parseTags(req.query.tag)
         });
 
@@ -99,6 +99,8 @@ const notesOptionsDefault: GetNotesOptions = {
 
 async function getNotes(userID: number, options = notesOptionsDefault): Promise<NoteAPIResponse[] | undefined> {
     const { search, tags } = options;
+
+    console.log(search, tags);
 
     const where: Prisma.NoteWhereInput = {
         authorID: userID,
@@ -196,8 +198,8 @@ export function searchNote(note: NoteAPIResponse, search: string) {
     if (!search) {
         return true;
     }
-    const title = note.title ? convertFromRaw(JSON.parse(note.title || "")).getPlainText() : "";
-    const content = note.title ? convertFromRaw(JSON.parse(note.content || "")).getPlainText() : "";
+    const title = note.title ? convertFromRaw(JSON.parse(note.title || "")).getPlainText().toLowerCase() : "";
+    const content = note.title ? convertFromRaw(JSON.parse(note.content || "")).getPlainText().toLowerCase() : "";
     if (title && content) {
         return title.includes(search) || content.includes(search);
     } else if (title) {

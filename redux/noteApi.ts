@@ -14,7 +14,7 @@ export const noteApi = createApi({
             providesTags: (result, error, id) => [{ type: "Note", id }] 
         }),
         getNotes: builder.query<NoteAPIResponse[], { tags?: string[], search?: string }>({
-            query: ({ tags, search }) => `/note?${tags ? `${convertTagArrayToQueryString(tags)}` : ""}${search ? `search=${search}` : ""}`,
+            query: ({ tags, search }) => `/note?${tags ? `${convertTagArrayToQueryString(tags)}` : ""}${search ? `&search=${search}` : ""}`,
             providesTags: ["Notes"]
         }),
         createNote: builder.mutation<NoteAPIResponse, NoteAPICreateRequest>({
