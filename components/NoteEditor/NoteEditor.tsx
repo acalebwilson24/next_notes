@@ -36,15 +36,15 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
 
     return (
         <div
-            className="h-full w-full absolute bg-white dark:bg-slate-900 flex"
+            className="h-full w-full absolute bg-white dark:bg-slate-900 flex overflow-hidden"
         >
             <motion.div className="flex-grow md:relative grid grid-cols-[400px_auto] divide-x divide-slate-300 dark:divide-slate-600 shadow-lg shadow-slate-700/5" animate={mobile ? (noteID == undefined ? "menu" : "note") : "desktop"} >
                 <motion.div className="absolute w-full h-full md:relative md:w-auto md:h-auto left-0 top-0 " variants={noteMenuVariants} transition={{ x: { type: "just", duration: duration/1000 } }}>
                     <NoteEditorControls id={noteID} mobile={false} setNoteID={setNoteID} createNewNote={() => { setNoteID(undefined); setNote(getDefaultInflatedNote()); }} />
                 </motion.div>
-                <motion.div className="absolute flex flex-col w-full h-full md:relative md:w-auto md:h-auto left-0 top-0 bg-white py-4 md:py-0" variants={noteMainVariants} transition={{ x: { type: "just", duration: duration/1000 } }}  >
+                <motion.div className="absolute overflow-auto flex flex-col w-full h-full md:relative md:w-auto md:h-auto left-0 top-0 bg-white py-4 md:py-0" variants={noteMainVariants} transition={{ x: { type: "just", duration: duration/1000 } }}  >
                     {mobile && <button className="mx-4 px-2 py-1 text-white rounded-md min-w-[80px] mb-2 bg-sky-600 self-start " onClick={backToMenuMobile}>Back</button>}
-                    <div className="flex justify-center overflow-auto w-full flex-grow">
+                    <div className="flex justify-center w-full flex-grow overflow-auto">
                         <div className="w-full max-w-5xl">
                             {noteToEdit && <NoteEditorMain
                                 note={noteToEdit}
