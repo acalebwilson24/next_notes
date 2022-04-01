@@ -23,7 +23,7 @@ export const PageBlock: React.FC<Props> = ({ children, width = "standard", backg
 
 const Layout: React.FC = ({ children }) => {
     return (
-        <div className="bg-slate-50 dark:bg-slate-900 min-h-screen flex flex-col">
+        <div className="bg-slate-50 dark:bg-slate-900 fixed top-0 left-0 w-full h-full flex flex-col">
             <Header links={[ ]} />
             <main className="flex-grow flex flex-col">
                 { children }
