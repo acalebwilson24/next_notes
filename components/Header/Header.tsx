@@ -77,7 +77,7 @@ const Menu: React.FC<{ show: boolean, mobile: boolean }> = ({ show, mobile, chil
     return (
         <motion.div
             className="
-            md:flex md:gap-4 md:items-center md:static md:h-auto md:bg-inherit md:flex-row md:p-0 md:shadow-none md:dark:bg-inherit
+            md:flex md:gap-4 md:items-center md:static md:h-auto md:bg-inherit md:flex-row md:p-0 md:shadow-none md:dark:bg-inherit md:justify-end
             fixed top-0 right-0 h-screen bg-white z-50 flex flex-col gap-4 p-6 min-w-[250px] items-end shadow-lg shadow-slate-700/5 dark:bg-slate-800"
 
             initial={{ x: "100%" }}
