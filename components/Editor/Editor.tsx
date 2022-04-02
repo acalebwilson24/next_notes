@@ -47,15 +47,15 @@ const OldEditor: React.FC<Props> = ({ value, onChange }) => {
 type SlateEditor = {
   value: Descendant[]
   setValue: (value: Descendant[]) => void
-  key?: string | number
+  editorKey?: string | number
   placeholder?: string
 }
 
-export const SlateEditor: FC<SlateEditor> = ({ value, setValue, key, placeholder }) => {
+export const SlateEditor: FC<SlateEditor> = ({ value, setValue, editorKey, placeholder }) => {
   const [ editor ] = useState(() => withReact(createEditor()));
 
   return (
-    <Slate value={value} onChange={setValue} editor={editor} key={key}  >
+    <Slate value={value} onChange={setValue} editor={editor} key={editorKey}  >
       <Editable className="w-full" placeholder={placeholder} />
     </Slate>
   )

@@ -41,22 +41,24 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
     return (
         <div className="flex flex-col h-full p-4 pt-0 md:pt-4">
             <div className="flex gap-2 items-center text-sm">
-                <div className="flex items-center gap-2">
-                    {note.tags && note.tags.map((tag, i) => <TagButton key={tag} deleteTag={() => removeTag(tag)}>{tag}</TagButton>)}
-                </div>
+                {note.tags && note.tags.length > 0 && (
+                    <div className="flex items-center gap-2">
+                        {note.tags.map((tag, i) => <TagButton key={tag} deleteTag={() => removeTag(tag)}>{tag}</TagButton>)}
+                    </div>
+                )}
                 <label>
                     <span className="hidden">New Tag</span>
                     <TagAutoComplete onChange={setTag} value={tag} placeholder="Add Tag..." suggestions={filteredTags} onSubmit={addTag} isFetching={isFetching} />
                 </label>
             </div>
             <div className="flex justify-between items-center">
-                <div className="text-xl mt-2 mb-2">
-                    <SlateEditor value={note.title} setValue={(value) => setNote({ ...note, title: value })} key={note.id} placeholder="Title" />
+                <div className="text-xl mt-2 mb-2 flex-grow">
+                    <SlateEditor value={note.title} setValue={(value) => setNote({ ...note, title: value })} editorKey={note.id} placeholder="Title" />
                 </div>
                 {isSaving ? <p>Saving...</p> : isSaved ? <p>Saved</p> : null}
             </div>
             <div className={styles.content}>
-                <SlateEditor value={note.content} setValue={(value) => setNote({ ...note, content: value })} key={note.id} placeholder="Content" />
+                <SlateEditor value={note.content} setValue={(value) => setNote({ ...note, content: value })} editorKey={note.id} placeholder="Content" />
             </div>
             {/* <div className="flex gap-4 fixed bottom-0 w-full mb-4 z-10 md:static md:mt-auto" ref={buttonsRef}>
                 <Button type="primary" handleClick={(e) => { e.preventDefault(); saveNote(); }}>Save</Button>
