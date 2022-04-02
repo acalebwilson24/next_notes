@@ -27,7 +27,7 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, 
     console.log(mobile);
     useEffect(() => {
         console.log(notes && notes.length, id);
-        if (notes && !id && !mobile) {
+        if (notes && notes.length && !id && !mobile) {
             setNoteID(notes[0].id);
         }
     }, [notes, mobile])

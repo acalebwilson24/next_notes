@@ -1,9 +1,10 @@
 import { Note } from "@prisma/client";
 import { EditorState } from "draft-js";
+import { Descendant } from "slate";
 
 export type InflatedNote = Pick<Note, "id" | "authorID" | "createdAt" | "updatedAt"> & {
-    title: EditorState,
-    content: EditorState
+    title: Descendant[],
+    content: Descendant[]
 } & { tags: string[] }
 
 export type NoteAPIResponse = Omit<Note, "createdAt" | "updatedAt"> & { tags: string[], createdAt: string, updatedAt: string }

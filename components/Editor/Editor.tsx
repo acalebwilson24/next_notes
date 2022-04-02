@@ -1,34 +1,67 @@
 import { convertFromHTML, Editor as DraftEditor, EditorState } from 'draft-js'
-import { useEffect, useState } from 'react';
+import { FC, MutableRefObject, RefObject, useEffect, useRef, useState } from 'react';
 import { stateToHTML } from 'draft-js-export-html'
+import { Editable, ReactEditor, Slate, withReact } from 'slate-react';
+import { BaseEditor, createEditor, Descendant } from 'slate';
+
+type CustomElement = { type: 'paragraph'; children: CustomText[] }
+type CustomText = { text: string }
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor
+    Element: CustomElement
+    Text: CustomText
+  }
+}
 
 type Props = {
-    value: string
-    onChange: {(value: string) : void }
+  value: string
+  onChange: { (value: string): void }
 }
 
-const Editor: React.FC<Props> = ({ value, onChange }) => {
-    const [editorState, setEditorState] = useState(
-        () => EditorState.createEmpty(),
-    );
+const OldEditor: React.FC<Props> = ({ value, onChange }) => {
+  const [editorState, setEditorState] = useState(
+    () => EditorState.createEmpty(),
+  );
 
-    useEffect(() => {
-        // need to prevent update loop
-        const stateAsHTML = stateToHTML(editorState.getCurrentContent());
+  useEffect(() => {
+    // need to prevent update loop
+    const stateAsHTML = stateToHTML(editorState.getCurrentContent());
 
-        if (stateAsHTML !== value) {
-            onChange(stateToHTML(editorState.getCurrentContent()))
-        }
-    }, [editorState])
+    if (stateAsHTML !== value) {
+      onChange(stateToHTML(editorState.getCurrentContent()))
+    }
+  }, [editorState])
 
-    useEffect(() => {
-        const blocksFromHTML = convertFromHTML(value);
-        
-    }, [value])
+  useEffect(() => {
+    const blocksFromHTML = convertFromHTML(value);
 
-    return (
-        <DraftEditor editorState={editorState} onChange={setEditorState} />
-    )
+  }, [value])
+
+  return (
+    <DraftEditor editorState={editorState} onChange={setEditorState} />
+  )
 }
 
-export default Editor;
+type SlateEditor = {
+  value: Descendant[]
+  setValue: (value: Descendant[]) => void
+  key?: string | number
+  placeholder?: string
+}
+
+export const SlateEditor: FC<SlateEditor> = ({ value, setValue, key, placeholder }) => {
+  const [ editor ] = useState(() => withReact(createEditor()));
+
+  console.log(value);
+
+  return (
+    <Slate value={value} onChange={setValue} editor={editor} key={key}  >
+      <Editable className="w-full" placeholder={placeholder} />
+    </Slate>
+  )
+
+}
+
+export default OldEditor;

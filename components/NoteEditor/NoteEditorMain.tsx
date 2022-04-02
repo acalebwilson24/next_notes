@@ -6,6 +6,7 @@ import { useGetTagsQuery } from "../../redux/noteApi"
 import { InflatedNote, TagAPIResponse } from "../../redux/types"
 import { filterTags } from "../../utils/tag"
 import Button from "../Button/Button"
+import { SlateEditor } from "../Editor/Editor"
 import TagAutoComplete from "../TagAutoComplete"
 import TagButton from "../TagButton"
 import styles from './styles/NoteEditorMain.module.css'
@@ -44,10 +45,10 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
                 </label>
             </div>
             <div className={styles.title}>
-                <Editor editorState={note.title} onChange={(e) => setNote({ ...note, title: e })} placeholder="Title" />
+                <SlateEditor value={note.title} setValue={(value) => setNote({ ...note, title: value })} key={note.id} placeholder="Title" />
             </div>
             <div className={styles.content}>
-                <Editor editorState={note.content} onChange={(e) => setNote({ ...note, content: e })} placeholder="Content" />
+                <SlateEditor value={note.content} setValue={(value) => setNote({ ...note, content: value })} key={note.id} placeholder="Content" />
             </div>
             <div className="flex gap-4 fixed bottom-0 w-full mb-4 z-10 md:static md:mt-auto" ref={buttonsRef}>
                 <Button type="primary" handleClick={(e) => { e.preventDefault(); saveNote(); }}>Save</Button>

@@ -1,5 +1,6 @@
 import { Note } from "@prisma/client";
 import { EditorState, convertFromRaw, RawDraftContentState, convertToRaw } from "draft-js";
+import { Descendant } from "slate";
 import { SerialisedNote } from "../redux/noteApi";
 import { InflatedNote, NoteAPIRequest, NoteAPIResponse } from "../redux/types";
 
@@ -21,8 +22,8 @@ export function inflateNote(note: NoteAPIResponse): InflatedNote {
         ...note,
         createdAt: new Date(note.createdAt),
         updatedAt: new Date(note.updatedAt),
-        title: note.title ? createEditorStateFromString(note.title) || EditorState.createEmpty() : EditorState.createEmpty(),
-        content: note.content ? createEditorStateFromString(note.content) || EditorState.createEmpty() : EditorState.createEmpty(),
+        title: note.title ? JSON.parse(note.title) as Descendant[] : [],
+        content: note.content ? JSON.parse(note.content) : [],
     }
     return newNote;
 }
@@ -30,8 +31,8 @@ export function inflateNote(note: NoteAPIResponse): InflatedNote {
 export function serialiseNote(note: InflatedNote): NoteAPIRequest {
     let newNote: NoteAPIRequest = {
         ...note,
-        title: convertEditorStateToString(note.title),
-        content: convertEditorStateToString(note.content)
+        title: JSON.stringify(note.title),
+        content: JSON.stringify(note.content)
     }
     return newNote;
 }
@@ -50,8 +51,8 @@ export function getDefaultInflatedNote() {
         authorID: -1,
         createdAt: new Date(),
         updatedAt: new Date(),
-        title: EditorState.createEmpty(),
-        content: EditorState.createEmpty(),
+        title: [{ type: "paragraph", children: [{ text: "" }] }],
+        content: [{ type: "paragraph", children: [{ text: "" }] }],
         tags: []
     } as InflatedNote
 }
