@@ -63,7 +63,7 @@ export const TagAutoComplete: FC<AutoCompleteProps> = ({ suggestions, placeholde
                 placeholder={placeholder} 
             />
             {
-                showSuggestions &&
+                showSuggestions && suggestions.length > 0 &&
                 (
                     <ul className="absolute z-20 flex flex-col w-full border border-slate-300 divide-y divide-slate-300 bg-white dark:bg-slate-700 dark:divide-slate-600 dark:border-slate-600" >
                         {isFetching ? <li className="py-2 px-2">Loading tags...</li> : suggestions.map((s, i) => (

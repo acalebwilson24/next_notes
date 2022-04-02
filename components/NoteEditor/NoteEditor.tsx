@@ -9,8 +9,13 @@ import { getDefaultInflatedNote, inflateNote, serialiseNote } from "../../utils/
 import { motion } from "framer-motion";
 import { Descendant, Node } from "slate";
 
-function areArraysEqual(array1: string[], array2: string[]) {
-    if(array1.sort().join(',') === array2.sort().join(',')){
+function areArraysEqual(array1: string[] | undefined, array2: string[] | undefined) {
+    if (!array1 || !array2) {
+        return false;
+    }
+    const arr1 = [...array1];
+    const arr2 = [...array2]
+    if(arr1.sort().join(',') === arr2.sort().join(',')){
         return true
     }
     return false
@@ -89,7 +94,7 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
             shouldSaveTimeout && clearTimeout(shouldSaveTimeout);
             const original = originalNote && serialiseNote(originalNote)
             const current = serialiseNote(noteToEdit)
-            if (original?.title !== current.title || original?.content !== current.content || areArraysEqual(original?.tags, current.tags)) {
+            if (original?.title !== current.title || original?.content !== current.content || !areArraysEqual(original?.tags, current.tags)) {
                 noteToEdit && updateNote(serialiseNote(noteToEdit));
             }
         }
