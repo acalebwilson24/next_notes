@@ -10,7 +10,6 @@ describe("useGetInflatedNotes", () => {
     beforeEach(() => {
         fetch.resetMocks();
         fetch.mockIf(() => true, async (req) => {
-            console.log(req.url);
             if (req.url.includes("/api/note")) {
                 return {
                     body: JSON.stringify([

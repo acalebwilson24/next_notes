@@ -6,10 +6,10 @@ import { Session } from 'next-auth';
 import { getSession } from 'next-auth/react';
 import { prisma } from '../../../prisma/client';
 import { NoteAPIRequest, NoteAPIResponse } from '../../../redux/types';
+import { serialiseDescendants } from '../../../utils/note';
 
 export async function getAuth(req: NextApiRequest) {
     if (req.headers.postman_token == process.env.POSTMAN_TOKEN) {
-        console.log("postman")
         const userID = 1;
         const user = await prisma.user.findUnique({
             where: { id: userID }
@@ -196,8 +196,8 @@ export function searchNote(note: NoteAPIResponse, search: string) {
     if (!search) {
         return true;
     }
-    const title = note.title ? convertFromRaw(JSON.parse(note.title || "")).getPlainText().toLowerCase() : "";
-    const content = note.title ? convertFromRaw(JSON.parse(note.content || "")).getPlainText().toLowerCase() : "";
+    const title = note.title ? serialiseDescendants(JSON.parse(note.title)).toLowerCase() : "";
+    const content = note.content ? serialiseDescendants(JSON.parse(note.content)).toLowerCase() : "";
     if (title && content) {
         return title.includes(search) || content.includes(search);
     } else if (title) {

@@ -62,7 +62,6 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
             if (shouldSaveTimeout) {
                 clearTimeout(shouldSaveTimeout);
             }
-            noteToEdit && console.log(noteToEdit.tags);
             const timeout = setTimeout(() => {
                 updateCurrentNote();
             }, 1000);
@@ -89,11 +88,11 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
 
     // wrapper for _setNoteID to ensure that the note is saved
     const setNoteID = (id: number | undefined) => {
-        // need to check note has actually changed
         if (noteID && noteToEdit) {
             shouldSaveTimeout && clearTimeout(shouldSaveTimeout);
             const original = originalNote && serialiseNote(originalNote)
             const current = serialiseNote(noteToEdit)
+            // checks if note has actually changed
             if (original?.title !== current.title || original?.content !== current.content || !areArraysEqual(original?.tags, current.tags)) {
                 noteToEdit && updateNote(serialiseNote(noteToEdit));
             }

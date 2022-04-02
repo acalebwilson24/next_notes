@@ -1,9 +1,10 @@
 import { InflatedNote } from "../../redux/types";
 import { Descendant, Node } from 'slate';
+import { serialiseDescendants } from "../../utils/note";
 
 const InflatedNoteCard: React.FC<InflatedNote & { selected?: boolean }> = ({ title, content, updatedAt, ...props }) => {
     function getDescendantString(content: Descendant[], trim = 50) {
-        const contentString = content.map(n => Node.string(n)).join('\n');
+        const contentString = serialiseDescendants(content);
         if (contentString.length > trim) {
             return contentString.substring(0, trim) + '...';
         }
@@ -20,31 +21,5 @@ const InflatedNoteCard: React.FC<InflatedNote & { selected?: boolean }> = ({ tit
         </div>
     )
 }
-
-// import escapeHtml from 'escape-html'
-// import { Descendant, Node, Text } from 'slate'
-
-// const serialize = (node: Descendant) => {
-//   if (Text.isText(node)) {
-//     let string = escapeHtml(node.text)
-//     if (node.bold) {
-//       string = `<strong>${string}</strong>`
-//     }
-//     return string
-//   }
-
-//   const children = node.children.map(n => serialize(n)).join('')
-
-//   switch (node.type) {
-//     case 'quote':
-//       return `<blockquote><p>${children}</p></blockquote>`
-//     case 'paragraph':
-//       return `<p>${children}</p>`
-//     case 'link':
-//       return `<a href="${escapeHtml(node.url)}">${children}</a>`
-//     default:
-//       return children
-//   }
-// }
 
 export default InflatedNoteCard;

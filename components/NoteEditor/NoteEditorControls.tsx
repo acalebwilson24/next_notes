@@ -33,7 +33,7 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, 
     return (
         <div className={`flex flex-col h-full`}>
             <div className={mobile ? "w-full" : ""}>
-                <NoteEditorFilter {...noteSearch} skip={!session?.data?.user.id} />
+                <NoteEditorFilter search={search} setSearch={setSearch} setTags={setTags} tags={tags} skip={!session?.data?.user.id} />
                 {
                     mobile ? 
                     <button className="fixed bottom-0 right-0 mb-4 mr-4 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md text-xl z-10" onClick={createNewNote}>+</button> :

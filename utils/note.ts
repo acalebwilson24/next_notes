@@ -1,6 +1,6 @@
 import { Note } from "@prisma/client";
 import { EditorState, convertFromRaw, RawDraftContentState, convertToRaw } from "draft-js";
-import { Descendant } from "slate";
+import { Descendant, Node } from "slate";
 import { SerialisedNote } from "../redux/noteApi";
 import { InflatedNote, NoteAPIRequest, NoteAPIResponse } from "../redux/types";
 
@@ -68,4 +68,8 @@ export function isJSONStr(str: string) {
 
 export function inflateNotes(notes: NoteAPIResponse[]) {
     return notes.filter(n => n.title && isJSONStr(n.title)).map(n => inflateNote(n));
+}
+
+export function serialiseDescendants(descendants: Descendant[]) {
+    return descendants.map(n => Node.string(n)).join('\n');
 }

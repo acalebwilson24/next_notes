@@ -7,10 +7,6 @@ import { useState } from "react";
 const TestPage: NextPage = () => {
     const [value, setValue] = useState<Descendant[]>([{ type: 'paragraph', children: [{ text: 'Hello there' }] }])
 
-    function onChange(e: Editor) {
-        console.log(e);
-    }
-
     return (
         <div className="max-w-7xl mx-auto bg-white w-full h-full p-8 my-8 rounded-lg shadow-lg flex flex-col">
             <h1 className="text-xl font-semibold mb-4 ">Slate Editor</h1>
