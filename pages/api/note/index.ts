@@ -120,7 +120,7 @@ async function getNotes(userID: number, options = notesOptionsDefault): Promise<
         },
         orderBy: [
             {
-                updatedAt: "desc"
+                createdAt: "desc"
             }
         ]
     }).then(notes => notes.filter(n => (tags && tags.length > 0) ? n.tags.length > 0 : true).map(n => mapNoteToResponse(n)));

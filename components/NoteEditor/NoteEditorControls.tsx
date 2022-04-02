@@ -24,9 +24,7 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, 
     const { data: notes, isLoading, isError } = useGetNotesQuery({ tags, search }, { skip: !session?.data?.user.id });
     const inflatedNotes = notes ? inflateNotes(notes) : [];
 
-    console.log(mobile);
     useEffect(() => {
-        console.log(notes && notes.length, id);
         if (notes && notes.length && !id && !mobile) {
             setNoteID(notes[0].id);
         }

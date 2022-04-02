@@ -18,9 +18,14 @@ type RightColumnProps = {
     deleteNote: { (): void }
     addTag: { (tag: string): void }
     removeTag: { (tag: string): void }
+    isSaving?: boolean
+    isSaved?: boolean
 }
 
-const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, deleteNote, addTag: _addTag, removeTag }) => {
+// when creating a note, actually create a note on the api with empty title and content
+// save note periodically (after a few seconds of inactivity)
+
+const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, deleteNote, addTag: _addTag, removeTag, isSaving, isSaved }) => {
     const [tag, setTag] = useState("");
     const buttonsRef = useRef<HTMLDivElement | null>(null);
     const mobile = useSelector((state: RootState) => state.mobile);
@@ -44,16 +49,19 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
                     <TagAutoComplete onChange={setTag} value={tag} placeholder="Add Tag..." suggestions={filteredTags} onSubmit={addTag} isFetching={isFetching} />
                 </label>
             </div>
-            <div className={styles.title}>
-                <SlateEditor value={note.title} setValue={(value) => setNote({ ...note, title: value })} key={note.id} placeholder="Title" />
+            <div className="flex justify-between items-center">
+                <div className="text-xl mt-2 mb-2">
+                    <SlateEditor value={note.title} setValue={(value) => setNote({ ...note, title: value })} key={note.id} placeholder="Title" />
+                </div>
+                {isSaving ? <p>Saving...</p> : isSaved ? <p>Saved</p> : null}
             </div>
             <div className={styles.content}>
                 <SlateEditor value={note.content} setValue={(value) => setNote({ ...note, content: value })} key={note.id} placeholder="Content" />
             </div>
-            <div className="flex gap-4 fixed bottom-0 w-full mb-4 z-10 md:static md:mt-auto" ref={buttonsRef}>
+            {/* <div className="flex gap-4 fixed bottom-0 w-full mb-4 z-10 md:static md:mt-auto" ref={buttonsRef}>
                 <Button type="primary" handleClick={(e) => { e.preventDefault(); saveNote(); }}>Save</Button>
                 <Button type="secondary" handleClick={deleteNote}>Delete</Button>
-            </div>
+            </div> */}
             {mobile && buttonsRef.current && <div style={{ height: buttonsRef.current.offsetHeight }} />}
         </div>
     )

@@ -54,8 +54,6 @@ type SlateEditor = {
 export const SlateEditor: FC<SlateEditor> = ({ value, setValue, key, placeholder }) => {
   const [ editor ] = useState(() => withReact(createEditor()));
 
-  console.log(value);
-
   return (
     <Slate value={value} onChange={setValue} editor={editor} key={key}  >
       <Editable className="w-full" placeholder={placeholder} />
