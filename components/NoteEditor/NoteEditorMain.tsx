@@ -41,15 +41,13 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
     return (
         <div className="flex flex-col h-full p-4 pt-0 md:pt-4">
             <div className="flex gap-2 items-center text-sm">
-                {note.tags && note.tags.length > 0 && (
-                    <div className="flex items-center gap-2">
-                        {note.tags.map((tag, i) => <TagButton key={tag} deleteTag={() => removeTag(tag)}>{tag}</TagButton>)}
-                    </div>
-                )}
-                <label>
-                    <span className="hidden">New Tag</span>
-                    <TagAutoComplete onChange={setTag} value={tag} placeholder="Add Tag..." suggestions={filteredTags} onSubmit={addTag} isFetching={isFetching} />
-                </label>
+                <div className="flex items-center gap-2 my-2 flex-wrap">
+                    {note.tags && note.tags.length > 0 && note.tags.map((tag, i) => <TagButton key={tag} deleteTag={() => removeTag(tag)}>{tag}</TagButton>)}
+                    <label className="w-32 block">
+                        <span className="hidden">New Tag</span>
+                        <TagAutoComplete onChange={setTag} value={tag} placeholder="Add Tag..." suggestions={filteredTags} onSubmit={addTag} isFetching={isFetching} />
+                    </label>
+                </div>
             </div>
             <div className="flex justify-between items-center">
                 <div className="text-xl mt-2 mb-2 flex-grow">

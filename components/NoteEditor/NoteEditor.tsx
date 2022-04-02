@@ -3,11 +3,18 @@ import NoteEditorMain from "./NoteEditorMain";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/configureStore";
-import { useCreateNoteMutation, useDeleteNoteMutation, useGetNoteQuery, useUpdateNoteMutation } from "../../redux/noteApi";
-import { InflatedNote } from "../../redux/types";
+import { SerialisedNote, useCreateNoteMutation, useDeleteNoteMutation, useGetNoteQuery, useUpdateNoteMutation } from "../../redux/noteApi";
+import { InflatedNote, NoteAPIRequest } from "../../redux/types";
 import { getDefaultInflatedNote, inflateNote, serialiseNote } from "../../utils/note";
 import { motion } from "framer-motion";
 import { Descendant, Node } from "slate";
+
+function areArraysEqual(array1: string[], array2: string[]) {
+    if(array1.sort().join(',') === array2.sort().join(',')){
+        return true
+    }
+    return false
+}
 
 // need to break up logic into custom hooks
 const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, isDeleted: { (): void } }> = ({ id, isSuccess, isDeleted }) => {
@@ -50,8 +57,9 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
             if (shouldSaveTimeout) {
                 clearTimeout(shouldSaveTimeout);
             }
+            noteToEdit && console.log(noteToEdit.tags);
             const timeout = setTimeout(() => {
-                noteToEdit && updateNote(serialiseNote(noteToEdit));
+                updateCurrentNote();
             }, 1000);
             setShouldSaveTimeout(timeout);
         }
@@ -62,12 +70,16 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
             }
         }
     }, [shouldSave])
+
+    function updateCurrentNote() {
+        noteToEdit && updateNote(serialiseNote(noteToEdit));
+    }
     
     // wrapper for _setNote with automatic saving
     const setNote = (note: InflatedNote | undefined) => {
         // update note
-        setShouldSave(true);
         _setNote(note);
+        setShouldSave(true);
     }
 
     // wrapper for _setNoteID to ensure that the note is saved
@@ -77,7 +89,7 @@ const NoteEditor: React.FC<{ id?: number, isSuccess: { (id?: number): void }, is
             shouldSaveTimeout && clearTimeout(shouldSaveTimeout);
             const original = originalNote && serialiseNote(originalNote)
             const current = serialiseNote(noteToEdit)
-            if (original?.title !== current.title || original?.content !== current.content) {
+            if (original?.title !== current.title || original?.content !== current.content || areArraysEqual(original?.tags, current.tags)) {
                 noteToEdit && updateNote(serialiseNote(noteToEdit));
             }
         }

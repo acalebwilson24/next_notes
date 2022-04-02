@@ -51,7 +51,7 @@ export const TagAutoComplete: FC<AutoCompleteProps> = ({ suggestions, placeholde
     }
 
     return (
-        <div className="relative" ref={inputRef}>
+        <div className="relative w-full" ref={inputRef}>
             <input 
                 type="text" 
                 onClick={() => setShowSuggestions(true)} 
@@ -59,7 +59,7 @@ export const TagAutoComplete: FC<AutoCompleteProps> = ({ suggestions, placeholde
                 value={value} 
                 onKeyDown={handleEnter} 
                 onChange={(e) => onChange(e.target.value)} 
-                className="py-1 px-2 border-b outline-none dark:bg-slate-700 dark:border-slate-700 border-slate-300" 
+                className="py-1 px-2 border-b outline-none dark:bg-slate-700 dark:border-slate-700 border-slate-300 w-full" 
                 placeholder={placeholder} 
             />
             {
