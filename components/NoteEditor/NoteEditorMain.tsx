@@ -29,8 +29,6 @@ type RightColumnProps = {
 
 const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, addTag: _addTag, removeTag, isSaving, isSaved }) => {
     const [tag, setTag] = useState("");
-    const buttonsRef = useRef<HTMLDivElement | null>(null);
-    const mobile = useSelector((state: RootState) => state.mobile);
     const { data: allTags, isFetching } = useGetTagsQuery({ });
 
     function addTag(tag: string) {
@@ -42,7 +40,7 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, addTag: _ad
         return null;
     }
 
-    const filteredTags = allTags && filterTags(allTags, note.tags, tag) || [];
+    const filteredTags = allTags && filterTags(allTags, note.tags, tag) || []; 
 
     return (
         <div className="flex flex-col h-full p-4 pt-0 md:pt-4">
@@ -64,7 +62,6 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, addTag: _ad
             <div className={styles.content}>
                 <SlateEditor value={note.content} setValue={(value) => setNote({ ...note, content: value })} editorKey={note.id} placeholder="Content" />
             </div>
-            {mobile && buttonsRef.current && <div style={{ height: buttonsRef.current.offsetHeight }} />}
         </div>
     )
 }
