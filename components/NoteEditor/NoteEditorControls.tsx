@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react";
 import React, { useEffect } from "react";
 import useDelaySearch from "../../hooks/useDelaySearch";
 import { useGetNotesQuery } from "../../redux/noteApi";
-import { inflateNotes } from "../../utils/note";
+import { inflateNotes, serialiseDescendants } from "../../utils/note";
 import { useNoteSearch } from "./hooks/useNoteEditor";
 import NoteEditorFilter from "./NoteEditorFilter";
 import NoteList from "./NoteList";
@@ -22,13 +22,13 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, 
 
     const { searchValue: search, setSearchValue: setSearch } = useDelaySearch(_setSearch);
     const { data: notes, isLoading, isError } = useGetNotesQuery({ tags, search }, { skip: !session?.data?.user.id });
-    const inflatedNotes = notes ? inflateNotes(notes) : [];
+    const inflatedNotes = notes ? inflateNotes(notes).filter(n => (serialiseDescendants(n.title).length || serialiseDescendants(n.content).length)) : [];
 
     useEffect(() => {
-        if (notes && notes.length && !id && !mobile) {
-            setNoteID(notes[0].id);
+        if (inflatedNotes && inflatedNotes.length && !id && !mobile) {
+            setNoteID(inflatedNotes[0].id);
         }
-    }, [notes, mobile])
+    }, [inflatedNotes, mobile])
 
     return (
         <div className={`flex flex-col h-full`}>

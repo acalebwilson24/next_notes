@@ -41,7 +41,7 @@ export const noteApi = createApi({
             invalidatesTags: ["Notes", "Tags"]
         }),
         getTags: builder.query<TagAPIResponse[], { tags?: string[] }>({
-            query: ({ tags }) => `/tag?${tags && convertTagArrayToQueryString(tags)}`,
+            query: ({ tags }) => `/tag?${tags && convertTagArrayToQueryString(tags) || ""}`,
             providesTags: ["Tags"]
         })
     })

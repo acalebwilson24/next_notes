@@ -2,17 +2,19 @@ import { Editor } from "draft-js"
 import React, { FC, ReactNode, useEffect, useRef, useState } from "react"
 import { useSelector } from "react-redux"
 import { RootState } from "../../redux/configureStore"
-import { useGetTagsQuery } from "../../redux/noteApi"
-import { InflatedNote, TagAPIResponse } from "../../redux/types"
+import { SerialisedNote, useDeleteNoteMutation, useGetTagsQuery, useUpdateNoteMutation } from "../../redux/noteApi"
+import { InflatedNote, NoteAPIResponse, TagAPIResponse } from "../../redux/types"
+import { inflateNote, serialiseNote } from "../../utils/note"
 import { filterTags } from "../../utils/tag"
 import Button from "../Button/Button"
 import { SlateEditor } from "../Editor/Editor"
 import TagAutoComplete from "../TagAutoComplete"
 import TagButton from "../TagButton"
 import styles from './styles/NoteEditorMain.module.css'
+import { v4 as uuid } from "uuid"
 
 type RightColumnProps = {
-    note: InflatedNote
+    note?: InflatedNote
     setNote: { (note: InflatedNote): void }
     saveNote: { (): void }
     deleteNote: { (): void }
@@ -25,7 +27,7 @@ type RightColumnProps = {
 // when creating a note, actually create a note on the api with empty title and content
 // save note periodically (after a few seconds of inactivity)
 
-const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, deleteNote, addTag: _addTag, removeTag, isSaving, isSaved }) => {
+const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, addTag: _addTag, removeTag, isSaving, isSaved }) => {
     const [tag, setTag] = useState("");
     const buttonsRef = useRef<HTMLDivElement | null>(null);
     const mobile = useSelector((state: RootState) => state.mobile);
@@ -34,6 +36,10 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
     function addTag(tag: string) {
         _addTag(tag);
         setTag("");
+    }
+
+    if (!note) {
+        return null;
     }
 
     const filteredTags = allTags && filterTags(allTags, note.tags, tag) || [];
@@ -58,13 +64,29 @@ const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, d
             <div className={styles.content}>
                 <SlateEditor value={note.content} setValue={(value) => setNote({ ...note, content: value })} editorKey={note.id} placeholder="Content" />
             </div>
-            {/* <div className="flex gap-4 fixed bottom-0 w-full mb-4 z-10 md:static md:mt-auto" ref={buttonsRef}>
-                <Button type="primary" handleClick={(e) => { e.preventDefault(); saveNote(); }}>Save</Button>
-                <Button type="secondary" handleClick={deleteNote}>Delete</Button>
-            </div> */}
             {mobile && buttonsRef.current && <div style={{ height: buttonsRef.current.offsetHeight }} />}
         </div>
     )
+}
+
+function areArraysEqual(array1: string[] | undefined, array2: string[] | undefined) {
+    if (!array1 || !array2) {
+        return false;
+    }
+    const arr1 = [...array1];
+    const arr2 = [...array2]
+    if(arr1.sort().join(',') === arr2.sort().join(',')){
+        return true
+    }
+    return false
+}
+
+function areNotesEqual(note: InflatedNote, other: InflatedNote) {
+    return note.title === other.title && note.content === other.content && areArraysEqual(note.tags, other.tags)
+}
+
+function isBlankNote(note: InflatedNote) {
+    return note.title.length === 0 && note.content.length === 0
 }
 
 export default NoteEditorMain;
