@@ -1,130 +1,119 @@
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import useGetInflatedNotes from "../../../hooks/useGetInflatedNotes/useGetInflatedNotes";
-import useRedirectAnon from "../../../hooks/useRedirectAnon";
-import { useCreateNoteMutation, useUpdateNoteMutation, useGetNoteQuery, useDeleteNoteMutation, useGetNotesQuery } from "../../../redux/noteApi";
+import { useGetNoteQuery, useCreateNoteMutation, useUpdateNoteMutation, useDeleteNoteMutation } from "../../../redux/noteApi";
 import { InflatedNote } from "../../../redux/types";
-import { getDefaultInflatedNote, inflateNote, inflateNotes, serialiseNote } from "../../../utils/note";
+import { inflateNote, serialiseNote, getDefaultInflatedNote, areNotesEqual, isBlankNote } from "../../../utils/note";
 
-// on navigate to desktop, create new note for editor, unless id is set in which case fetch note
-// on navigate to mobile, create no note, wait for selection or new note button, or id is set in which case fetch note and switch to editor
+function useNoteEditor() {
+    const [noteID, setNoteID] = useState<number>()
+    const [noteToEdit, _setNote] = useState<InflatedNote>()
+    const [originalNote, setOriginalNote] = useState<InflatedNote>();
+    const [showEditor, setShowEditor] = useState(false);
+    const { data: note, isLoading, isFetching } = useGetNoteQuery(noteID, { skip: !noteID })
 
-export function useNoteSearch() {
-    const [search, setSearch] = useState("")
-    const [tags, setTags] = useState<string[]>([]);
-
-    return {
-        search,
-        setSearch,
-        tags,
-        setTags
-    }
-}
-
-type UseNoteEditorParams = {
-    id?: number,
-    newNote?: boolean,
-    queryTags?: string[],
-    search?: string
-}
-
-function useNoteEditor(params: UseNoteEditorParams) {
-    const { id, newNote, queryTags, search } = params;
-
-    // data
-    const { data: notes, isLoading, isError } = useGetNotesQuery({ tags: queryTags, search });
-    const { data: serialisedNote, isError: isNoteError } = useGetNoteQuery(id ? id : 0, { skip: !id });
-
-    // mutations
-    const [createNote, { isLoading: isCreating, isSuccess: isCreated, data: createdNote }] = useCreateNoteMutation();
-    const [updateNote, { isLoading: isUpdating, isSuccess: isUpdated, data: updatedNote }] = useUpdateNoteMutation();
-    const [deleteNoteAction, { isSuccess: isDeleted }] = useDeleteNoteMutation();
-
-    // local note
-    const [note, setNote] = useState<InflatedNote>();
-
-    function createNewNote() {
-        setNote(getDefaultInflatedNote());
-    }
-
-    function clearNote() {
-        setNote(undefined);
-    }
-
-    // turns fetch data into inflated note
+    // handles note selection
     useEffect(() => {
-        if (!id && note && note.id !== -1) {
-            clearNote();
-            return
-        }
-
-        if (serialisedNote) {
-            const inflatedNote = inflateNote(serialisedNote);
-            if (inflatedNote) {
-                setNote(inflatedNote)
+        if (note && noteID) {
+            const inflatedNote = inflateNote(note);
+            // prevents error when tying to set an old copy of the note
+            // if the update request was slow
+            if (!noteToEdit || inflatedNote.id !== noteToEdit.id) {
+                _setNote(inflatedNote);
             }
-        } 
-    }, [serialisedNote, isLoading, id])
+            setOriginalNote(inflatedNote)
+            setShowEditor(true);
+        }
+    }, [note, noteID])
 
 
-    function saveNote() {
-        if (!note) {
-            return
+    const [createNote, { isSuccess: noteCreated, data: newNote }] = useCreateNoteMutation();
+    const [updateNote, { isLoading: isUpdating, isSuccess: isUpdated, data: updatedNote }] = useUpdateNoteMutation();
+    const [deleteNote] = useDeleteNoteMutation();
+
+    // automatic saving
+    const [saveTimeout, setSaveTimeout] = useState<NodeJS.Timeout | null>(null);
+
+    function saveNoteWithTimeout(noteToSave: InflatedNote) {
+        if (saveTimeout) {
+            clearTimeout(saveTimeout);
         }
-        const noteToSave = serialiseNote(note);
-        if (note.id == -1) {
-            return createNote(noteToSave);
+
+        if (!originalNote || !areNotesEqual(noteToSave, originalNote)) {
+            const timeout = setTimeout(() => {
+                updateNote(serialiseNote(noteToSave));
+            }, 1000);
+            setSaveTimeout(timeout);
         }
-        updateNote(noteToSave);
     }
 
-    function deleteNote() {
-        if (!note) {
-            return
+    useEffect(() => {
+        if (updatedNote) {
+            setOriginalNote(inflateNote(updatedNote));
         }
-        
-        const noteToDelete = serialiseNote(note);
-        deleteNoteAction(noteToDelete);
+    }, [updatedNote])
+
+    // wrapper for _setNote with automatic saving
+    const setNote = (note: InflatedNote | undefined) => {
+        // update note
+        _setNote(note);
+        note && saveNoteWithTimeout({ ...note });
     }
 
-    function addTag(tag: string) {
-        if (!note) {
-            return
+    const createBlankNote = () => {
+        if (noteToEdit && isBlankNote(noteToEdit)) {
+            setShowEditor(true);
+            return;
         }
-        const newNote = { ...note, tags: [...note.tags, tag] };
-        newNote.tags.sort();
-
-        setNote(newNote);
+        setNoteID(undefined);
+        const newNote = {
+            ...getDefaultInflatedNote()
+        }
+        createNote(serialiseNote(newNote));
+        setShowEditor(true);
     }
 
-    function removeTag(tag: string) {
-        if (!note) {
-            return
+    function openNote(noteID: number) {
+        // check if a note is already open
+        if (noteID) {
+            closeNote();
+        }
+        setNoteID(noteID);
+    }
+
+    function closeNote() {
+        if (noteToEdit && isBlankNote(noteToEdit)) {
+            console.log("deleting")
+            deleteNote(serialiseNote(noteToEdit))
+        } else if (noteID && noteToEdit) {
+            saveTimeout && clearTimeout(saveTimeout);
+            // checks if note has actually changed
+            if (originalNote && !areNotesEqual(originalNote, noteToEdit)) {
+                noteToEdit && updateNote(serialiseNote(noteToEdit));
+            }
         }
 
-        const newNote = { ...note, tags: note.tags.filter(t => t !== tag) };
-        newNote.tags.sort();
-
-        setNote({ ...note, tags: note.tags.filter(t => t !== tag) })
+        setNoteID(undefined);
+        showEditor && setShowEditor(false);
     }
+
+    // checks if not is created then opens note
+    useEffect(() => {
+        if (noteCreated && newNote) {
+            setNoteID(newNote.id);
+        }
+    }, [noteCreated, newNote])
 
     return {
-        isError,
-        inflatedNotes: notes ? inflateNotes(notes) : [],
-        areNotesLoading: isLoading,
-        id,
-        note,
+        showEditor,
+        noteID,
+        openNote,
+        createBlankNote,
+        closeNote,
+        noteToEdit,
         setNote,
-        saveNote,
         deleteNote,
-        createdNote,
-        isDeleted,
-        createNewNote,
-        clearNote,
+        updateNote,
         isLoading,
-        addTag,
-        removeTag
+        isFetching
     }
 }
 

@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import useDelaySearch from "../../hooks/useDelaySearch";
 import { useGetNotesQuery } from "../../redux/noteApi";
 import { inflateNotes, serialiseDescendants } from "../../utils/note";
-import { useNoteSearch } from "./hooks/useNoteEditor";
+import useNoteSearch from "./hooks/useNoteSearch";
 import NoteEditorFilter from "./NoteEditorFilter";
 import NoteList from "./NoteList";
 import styles from './styles/NoteEditorControls.module.css';
@@ -11,11 +11,11 @@ import styles from './styles/NoteEditorControls.module.css';
 type LeftColumnProps = {
     id?: number
     mobile: boolean
-    setNoteID: {(id: number): void}
-    createNewNote: () => void
+    openNote: {(id: number): void}
+    createBlankNote: () => void
 }
 
-const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, createNewNote }) => {
+const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, openNote, createBlankNote }) => {
     const session = useSession();
     const noteSearch = useNoteSearch();
     const { search: _search, setSearch: _setSearch, tags, setTags } = noteSearch;
@@ -26,7 +26,7 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, 
 
     useEffect(() => {
         if (inflatedNotes && inflatedNotes.length && !id && !mobile) {
-            setNoteID(inflatedNotes[0].id);
+            openNote(inflatedNotes[0].id);
         }
     }, [inflatedNotes, mobile])
 
@@ -36,8 +36,8 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, 
                 <NoteEditorFilter search={search} setSearch={setSearch} setTags={setTags} tags={tags} skip={!session?.data?.user.id} />
                 {
                     mobile ? 
-                    <button className="fixed bottom-0 right-0 mb-4 mr-4 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md text-xl z-10" onClick={createNewNote}>+</button> :
-                    <button onClick={createNewNote} className="w-full bg-sky-600 text-white px-2 py-1">New</button>
+                    <button className="fixed bottom-0 right-0 mb-4 mr-4 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md text-xl z-10" onClick={createBlankNote}>+</button> :
+                    <button onClick={createBlankNote} className="w-full bg-sky-600 text-white px-2 py-1">New</button>
                 }
             </div>
             <div className="flex-grow h-full relative">
@@ -48,7 +48,7 @@ const NoteEditorControls: React.FC<LeftColumnProps> = ({ id, mobile, setNoteID, 
                             isError ?
                                 <Message>Error</Message> :
                                 inflatedNotes.length ?
-                                    <NoteList notes={inflatedNotes} selected={id || 0} setNoteID={setNoteID}  /> :
+                                    <NoteList notes={inflatedNotes} selected={id || 0} setNoteID={openNote}  /> :
                                     isLoading ?
                                         <Message>Loading notes...</Message> :
                                         <Message>No notes</Message>

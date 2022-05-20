@@ -9,20 +9,7 @@ import { RootState } from "../redux/configureStore";
 import "/node_modules/draft-js/dist/Draft.css";
 
 const Notes: NextPage = () => {
-    const router = useRouter();
-    const { id, type } = router.query as { id?: string, type?: string };
-    const mobile = useSelector((state: RootState) => state.mobile);
     const { data, status } = useSession();
-
-    function isSuccess(id?: number) {
-        if (id) {
-            router.push("/?id=" + id);
-        }
-    }
-
-    function isDeleted() {
-        router.push("/");
-    }
 
     if (status == "loading") {
         return <div>Loading...</div>
@@ -36,7 +23,7 @@ const Notes: NextPage = () => {
 
     return (
         <div className="h-full flex-grow relative">
-            <NoteEditor id={id ? parseInt(id) : undefined} isSuccess={isSuccess} isDeleted={isDeleted} />
+            <NoteEditor />
         </div>
     )
 }

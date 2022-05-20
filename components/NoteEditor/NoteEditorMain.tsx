@@ -1,17 +1,11 @@
-import { Editor } from "draft-js"
-import React, { FC, ReactNode, useEffect, useRef, useState } from "react"
-import { useSelector } from "react-redux"
-import { RootState } from "../../redux/configureStore"
-import { SerialisedNote, useDeleteNoteMutation, useGetTagsQuery, useUpdateNoteMutation } from "../../redux/noteApi"
-import { InflatedNote, NoteAPIResponse, TagAPIResponse } from "../../redux/types"
-import { inflateNote, serialiseNote } from "../../utils/note"
+import React, { useState } from "react"
+import { useGetTagsQuery } from "../../redux/noteApi"
+import { InflatedNote } from "../../redux/types"
 import { filterTags } from "../../utils/tag"
-import Button from "../Button/Button"
 import { SlateEditor } from "../Editor/Editor"
 import TagAutoComplete from "../TagAutoComplete"
 import TagButton from "../TagButton"
 import styles from './styles/NoteEditorMain.module.css'
-import { v4 as uuid } from "uuid"
 
 type RightColumnProps = {
     note?: InflatedNote
@@ -76,14 +70,6 @@ function areArraysEqual(array1: string[] | undefined, array2: string[] | undefin
         return true
     }
     return false
-}
-
-function areNotesEqual(note: InflatedNote, other: InflatedNote) {
-    return note.title === other.title && note.content === other.content && areArraysEqual(note.tags, other.tags)
-}
-
-function isBlankNote(note: InflatedNote) {
-    return note.title.length === 0 && note.content.length === 0
 }
 
 export default NoteEditorMain;

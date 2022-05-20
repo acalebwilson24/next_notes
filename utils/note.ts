@@ -73,3 +73,33 @@ export function inflateNotes(notes: NoteAPIResponse[]) {
 export function serialiseDescendants(descendants: Descendant[]) {
     return descendants.map(n => Node.string(n)).join('\n');
 }
+
+export function serialise(content: Descendant[]) {
+    return content.map(n => Node.string(n)).join('\n')
+}
+
+
+export function areNotesEqual(note: InflatedNote, other: InflatedNote) {
+    const areEqual = areSlateStatesEqual(note.title, other.title) && areSlateStatesEqual(note.content, other.content) && areArraysEqual(note.tags, other.tags)
+    return areEqual
+}
+
+export function areSlateStatesEqual(state1: Descendant[], state2: Descendant[]) {
+    return serialise(state1) === serialise(state2)
+}
+
+export function isBlankNote(note: InflatedNote) {
+    return serialise(note.title).length === 0 && serialise(note.content).length === 0
+}
+
+function areArraysEqual(array1: string[] | undefined, array2: string[] | undefined) {
+    if (!array1 || !array2) {
+        return false;
+    }
+    const arr1 = [...array1];
+    const arr2 = [...array2]
+    if (arr1.sort().join(',') === arr2.sort().join(',')) {
+        return true
+    }
+    return false
+}
