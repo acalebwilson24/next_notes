@@ -1,4 +1,5 @@
-import { Editor } from "draft-js"
+import { Editor, EditorState } from "draft-js"
+import { SerialisedNote } from "../../redux/noteApi"
 import { InflatedNote } from "../../redux/types"
 import Button from "../Button/Button"
 import styles from './styles/NoteEditorMain.module.css'
@@ -11,6 +12,13 @@ type RightColumnProps = {
 }
 
 const NoteEditorMain: React.FC<RightColumnProps> = ({ note, setNote, saveNote, deleteNote }) => {
+    // for verifying if an object is of a certain type, allows typescript to recognise
+    // a type 
+    function isInflatedNote(note: InflatedNote | SerialisedNote): note is InflatedNote {
+        // perform a check which determines whether it is valid
+        return typeof (note as InflatedNote).title == "object";
+    }
+
     return (
         <div className={styles.right}>
             <div className={styles.title}>
